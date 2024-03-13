@@ -1,13 +1,14 @@
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
- "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="1080.000000pt" height="1080.000000pt" viewBox="0 0 1080.000000 1080.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-<path d="M5310 5400 l0 -5400 2745 0 2745 0 0 5400 0 5400 -2745 0 -2745 0 0
--5400z"/>
-</g>
+<svg version="1.1" id="Uploaded to svgrepo.com"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32.00 32.00" xml:space="preserve" fill="#000000">
+	<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+	<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+	<g id="SVGRepo_iconCarrier">
+		<style type="text/css"> .pictogram_zes{fill:#000000;} .pictogram_een{fill:#d93c08;} .pictogram_vier{fill:#006b0c;} .st0{fill:#F8AD89;} .st1{fill:#01A59C;} .st2{fill:none;} .st3{fill:#F27261;} </style>
+		<g>
+			<path class="pictogram_een" d="M16,0C7.163,0,0,7.163,0,16s7.163,16,16,16V16V0z"></path>
+			<path class="pictogram_vier" d="M32,16c0-8.837-7.163-16-16-16v16H32z"></path>
+			<path class="pictogram_zes" d="M16,16v16c8.837,0,16-7.163,16-16H16z"></path>
+		</g>
+	</g>
 </svg>

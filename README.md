@@ -25,7 +25,7 @@ Note: You will need to obtain a PaySpace Authentication key and configure it in 
 
 ## Development
 
-We welcome contributions to this node. Feel free to create pull requests for bug fixes or improvements.
+All contributions to this node are welcome. Feel free to create pull requests for bug fixes or improvements.
 
 You can get in contact with the developer [here](https://github.com/onlypfachi)
 

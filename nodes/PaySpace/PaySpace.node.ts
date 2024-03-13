@@ -5,7 +5,8 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import fetch from 'node-fetch';
+import axios from 'axios';
+import qs from 'qs';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -130,43 +131,34 @@ export class PaySpace implements INodeType {
 			const environment = this.getNodeParameter('environment', i) as string;
 			const scope = this.getNodeParameter('scope', 0) as string;
 			try {
-				async function getToken() {
-					if (operation === 'getToken') {
-						const client_id = credentials.client_id as string;
-						const client_secret = credentials.client_secret as string;
+				if (operation === 'getToken') {
+					const client_id = credentials.client_id;
+					const client_secret = credentials.client_secret;
+					const tokenUrl: string =
+						environment === 'testing'
+							? 'https://staging-identity.yourhcm.com'
+							: 'https://identity.yourhcm.com/connect/token';
 
-						const tokenUrl =
-							environment === 'testing'
-								? 'https://staging-identity.yourhcm.com'
-								: 'https://identity.yourhcm.com/connect/token';
+					const data: string = qs.stringify({
+						client_id: client_id,
+						client_secret: client_secret,
+						scope: scope,
+					});
 
-						const myHeaders = new Headers();
-						myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+					const config: any = {
+						method: 'post',
+						maxBodyLength: Infinity,
+						url: tokenUrl,
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						data: data,
+					};
 
-						const urlencoded = new URLSearchParams();
-						urlencoded.append('client_id', client_id);
-						urlencoded.append('client_secret', client_secret);
-						urlencoded.append('scope', scope);
-
-						const requestOptions: any = {
-							method: 'POST',
-							headers: myHeaders,
-							body: urlencoded,
-							redirect: 'follow',
-						};
-
-						try {
-							const response = await fetch(tokenUrl, requestOptions);
-							const result = await response.json();
-							responseData = [{ json: result }];
-							console.log(result); // Logging the result for debugging
-						} catch (error) {
-							console.log('error', error);
-						}
-					}
+					const response: any = await axios(config);
+					responseData = [{ json: response.data }];
+					console.log(response.data);
 				}
-
-				getToken();
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
