@@ -36,14 +36,9 @@ export class PaySpaceApi implements ICredentialType {
 			name: 'client_secret',
 			type: 'string',
 			typeOptions: {
-				password: true,
+				password: false,
 			},
 			default: '',
-			displayOptions: {
-				show: {
-					client: ['private', 'public'],
-				},
-			},
 		},
 	];
 }

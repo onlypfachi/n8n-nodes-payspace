@@ -5,7 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import axios from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
 export class PaySpace implements INodeType {
@@ -123,20 +123,20 @@ export class PaySpace implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
-		const operation = this.getNodeParameter('operation', 0);
 		const credentials = await this.getCredentials('clientCredentialApi');
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {
+		const operation = this.getNodeParameter('operation', i) as string;
 			const environment = this.getNodeParameter('environment', i) as string;
-			const scope = this.getNodeParameter('scope', 0) as string;
+			const scope = this.getNodeParameter('client_scope', i) as string;
 			try {
 				if (operation === 'getToken') {
 					const client_id = credentials.client_id;
 					const client_secret = credentials.client_secret;
 					const tokenUrl: string =
 						environment === 'testing'
-							? 'https://staging-identity.yourhcm.com'
+							? 'https://staging-identity.yourhcm.com/connect/token'
 							: 'https://identity.yourhcm.com/connect/token';
 
 					const data: string = qs.stringify({
@@ -145,19 +145,20 @@ export class PaySpace implements INodeType {
 						scope: scope,
 					});
 
-					const config: any = {
+					const config: AxiosRequestConfig = {
 						method: 'post',
 						maxBodyLength: Infinity,
 						url: tokenUrl,
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded',
+							'User-Agent': 'payspace.com'
 						},
 						data: data,
 					};
 
-					const response: any = await axios(config);
-					responseData = [{ json: response.data }];
-					console.log(response.data);
+					const response: AxiosResponse = await axios(config);
+					responseData = [{ json: response.data}];
+					console.log(JSON.stringify(response.data));
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(
