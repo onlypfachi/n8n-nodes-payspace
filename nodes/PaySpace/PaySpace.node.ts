@@ -25,7 +25,7 @@ export class PaySpace implements INodeType {
 		outputs: ['main'],
 		credentials: [
 			{
-				name: 'paySpaceApi',
+				name: 'clientCredentialApi',
 				required: true,
 			},
 		],
@@ -124,7 +124,7 @@ export class PaySpace implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const operation = this.getNodeParameter('operation', 0);
-		const credentials = await this.getCredentials('paySpaceApi');
+		const credentials = await this.getCredentials('clientCredentialApi');
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {

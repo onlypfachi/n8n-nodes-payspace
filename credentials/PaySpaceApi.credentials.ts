@@ -20,7 +20,7 @@ export class PaySpaceApi implements ICredentialType {
 			],
 			default: 'testing',
 			description:
-				'Arw these credentials for testing or production environment?',
+				'Are these credentials for testing or production environment?',
 		},
 		{
 			displayName: 'Client ID',
