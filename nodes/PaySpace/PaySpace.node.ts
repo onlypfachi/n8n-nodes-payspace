@@ -127,17 +127,23 @@ export class PaySpace implements INodeType {
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {
-		const operation = this.getNodeParameter('operation', i) as string;
+			const operation = this.getNodeParameter('operation', i) as string;
 			const environment = this.getNodeParameter('environment', i) as string;
 			const scope = this.getNodeParameter('client_scope', i) as string;
+			const authenticationUrl: string =
+				environment === 'testing'
+					? 'https://staging-identity.yourhcm.com/connect/token'
+					: 'https://identity.yourhcm.com/connect/token';
+			const apiUrl: string =
+				environment === 'testing'
+					? 'https://apistaging.payspace.com'
+					: 'https://api.payspace.com';
+
 			try {
+				// Get access token
 				if (operation === 'getToken') {
 					const client_id = credentials.client_id;
 					const client_secret = credentials.client_secret;
-					const tokenUrl: string =
-						environment === 'testing'
-							? 'https://staging-identity.yourhcm.com/connect/token'
-							: 'https://identity.yourhcm.com/connect/token';
 
 					const data: string = qs.stringify({
 						client_id: client_id,
@@ -148,16 +154,34 @@ export class PaySpace implements INodeType {
 					const config: AxiosRequestConfig = {
 						method: 'post',
 						maxBodyLength: Infinity,
-						url: tokenUrl,
+						url: authenticationUrl,
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded',
-							'User-Agent': 'payspace.com'
+							'User-Agent': 'payspace.com',
 						},
 						data: data,
 					};
 
 					const response: AxiosResponse = await axios(config);
-					responseData = [{ json: response.data}];
+					responseData = [{ json: response.data }];
+					console.log(JSON.stringify(response.data));
+				}
+
+				// Get Meta Data
+				if (operation === 'getMetadata') {
+					const company_id = this.getNodeParameter('company_id', i) as string;
+					const payspace_access_token = this.getNodeParameter('payspace_access_token', i) as string;
+					const config: AxiosRequestConfig = {
+						method: 'get',
+						maxBodyLength: Infinity,
+						url: apiUrl+'/odata/v1.1/'+company_id+'/$metadata',
+						headers: {
+							Authorization: 'Bearer ' + payspace_access_token,
+						},
+					};
+
+					const response: AxiosResponse = await axios(config);
+					responseData = [{ json: response.data }];
 					console.log(JSON.stringify(response.data));
 				}
 
