@@ -7,6 +7,14 @@ import type {
 } from 'n8n-workflow';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
+import {
+	apiOptions,
+	endpointCollectionsOptions,
+	endpointsOptions,
+	operationsOptions,
+	paramsOptions,
+	scopeOptions,
+} from './options';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -31,24 +39,6 @@ export class PaySpace implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				noDataExpression: true,
-				options: [
-					{
-						name: 'Get Token',
-						value: 'getToken',
-					},
-					{
-						name: 'Get Metadata',
-						value: 'getMetadata',
-					},
-				],
-				default: 'getToken',
-				description: 'Which operation to use?',
-			},
-			{
 				displayName: 'Environment',
 				name: 'environment',
 				type: 'options',
@@ -67,27 +57,19 @@ export class PaySpace implements INodeType {
 				description: 'Which environment do you want to query in?',
 			},
 			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				options: operationsOptions,
+				default: 'getToken',
+				description: 'Which operation to use?',
+			},
+			{
 				displayName: 'Scope',
 				name: 'client_scope',
 				type: 'options',
-				options: [
-					{
-						name: 'Full Access',
-						value: 'api.full_access',
-					},
-					{
-						name: 'Read Only',
-						value: 'api.read_only',
-					},
-					{
-						name: 'Update',
-						value: 'api.update',
-					},
-					{
-						name: 'Create',
-						value: 'api.create',
-					},
-				],
+				options: scopeOptions,
 				default: 'api.full_access',
 				displayOptions: {
 					show: {
@@ -97,25 +79,96 @@ export class PaySpace implements INodeType {
 			},
 			{
 				displayName: 'Company ID',
-				name: 'company_id',
-				type: 'string',
+				name: 'companyId',
+				type: 'number',
 				default: '',
 				displayOptions: {
 					show: {
-						operation: ['getMetadata'],
+						operation: ['getMetadata', 'employee'],
 					},
 				},
+				placeholder: '123456789',
+				description: 'Your company ID',
+			},
+			{
+				displayName: 'Endpoint Collection',
+				name: 'endpointCollection',
+				type: 'options',
+				options: endpointCollectionsOptions,
+				default: 'basicInformation',
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+					},
+				},
+				placeholder: '123456789',
+				description: 'Collection of endpoints related to operation',
+			},
+			{
+				displayName: 'Endpoint',
+				name: 'endpoint',
+				type: 'options',
+				options: endpointsOptions,
+				default: 'biographical',
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+					},
+				},
+				description: 'Endpoints related to operation',
+			},
+			{
+				displayName: 'Api',
+				name: 'api',
+				type: 'options',
+				options: apiOptions,
+				default: 'getACollectionOfEmployees',
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+					},
+				},
+				placeholder: 'yourTokenType',
+				description: 'Api related to operation',
+			},
+			{
+				displayName: 'PARAMS',
+				name: 'params',
+				type: 'collection',
+				placeholder: 'Optional parameters',
+				default: {},
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+					},
+				},
+				options: paramsOptions,
+			},
+			{
+				displayName: 'Token Type',
+				name: 'tokenType',
+				type: 'string',
+				default: 'Bearer',
+				displayOptions: {
+					show: {
+						operation: ['getMetadata', 'employee'],
+					},
+				},
+				placeholder: 'yourTokenType',
+				description: 'The Authorization bearer token type',
 			},
 			{
 				displayName: 'PaySpace Access Token',
-				name: 'payspace_access_token',
+				name: 'paySpaceAccessToken',
 				type: 'string',
 				default: '',
 				displayOptions: {
 					show: {
-						operation: ['getMetadata'],
+						operation: ['getMetadata', 'employee'],
 					},
 				},
+				placeholder: 'y0urP4y5p4c34cc355T0k3nFr0mG3tT0k3nN0d3...',
+				description: 'The Authorization bearer token',
 			},
 		],
 	};
@@ -129,61 +182,110 @@ export class PaySpace implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			const operation = this.getNodeParameter('operation', i) as string;
 			const environment = this.getNodeParameter('environment', i) as string;
-			const scope = this.getNodeParameter('client_scope', i) as string;
+			const apiUrl: string =
+				environment === 'testing' ? 'https://apistaging.payspace.com' : 'https://api.payspace.com';
 			const authenticationUrl: string =
 				environment === 'testing'
 					? 'https://staging-identity.yourhcm.com/connect/token'
 					: 'https://identity.yourhcm.com/connect/token';
-			const apiUrl: string =
-				environment === 'testing'
-					? 'https://apistaging.payspace.com'
-					: 'https://api.payspace.com';
 
 			try {
-				// Get access token
-				if (operation === 'getToken') {
-					const client_id = credentials.client_id;
-					const client_secret = credentials.client_secret;
+				let config: AxiosRequestConfig = {};
 
-					const data: string = qs.stringify({
-						client_id: client_id,
-						client_secret: client_secret,
-						scope: scope,
-					});
+				switch (operation) {
+					case 'getToken':
+						// Get access token
 
-					const config: AxiosRequestConfig = {
-						method: 'post',
-						maxBodyLength: Infinity,
-						url: authenticationUrl,
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-							'User-Agent': 'payspace.com',
-						},
-						data: data,
-					};
+						let scope = this.getNodeParameter('client_scope', i) as string;
+						const client_id = credentials.client_id;
+						const client_secret = credentials.client_secret;
 
-					const response: AxiosResponse = await axios(config);
-					responseData = [{ json: response.data }];
-					console.log(JSON.stringify(response.data));
+						const data: string = qs.stringify({
+							client_id: client_id,
+							client_secret: client_secret,
+							scope: scope,
+						});
+
+						config = {
+							method: 'post',
+							maxBodyLength: Infinity,
+							url: authenticationUrl,
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded',
+								'User-Agent': 'payspace.com',
+							},
+							data: data,
+						};
+						break;
+					case 'getMetadata':
+						// Get Meta Data
+						const companyId = this.getNodeParameter('companyId', i) as number;
+						const paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+						const tokenType = this.getNodeParameter('tokenType', i) as string;
+
+						config = {
+							method: 'get',
+							maxBodyLength: Infinity,
+							url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
+							headers: {
+								Authorization: tokenType + ' ' + paySpaceAccessToken,
+							},
+						};
+						break;
+					case 'Employee':
+						const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
+						const endpoint = this.getNodeParameter('endpoint', i) as string;
+						const api = this.getNodeParameter('api', i) as string;
+						// Employee \ Basic Information \ Biographical \ Get a collection of employees
+						if (
+							endpointCollection === 'Basic Information' &&
+							endpoint === 'Biographical' &&
+							api === 'Get a collection of employees'
+						) {
+							const companyId = this.getNodeParameter('companyId', i) as number;
+							const paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+							const tokenType = this.getNodeParameter('tokenType', i) as string;
+							const orderBy = this.getNodeParameter('orderBy', i) as string;
+							const top = this.getNodeParameter('top', i) as number;
+							const skip = this.getNodeParameter('skip', i) as number;
+							const count = this.getNodeParameter('count', i) as boolean;
+							const filter = this.getNodeParameter('filter', i) as string;
+							const select = this.getNodeParameter('select', i) as string;
+
+							config = {
+								method: 'get',
+								maxBodyLength: Infinity,
+								url:
+									apiUrl +
+									'/odata/v1.1/' +
+									companyId +
+									'/Employee?$orderby=' +
+									orderBy +
+									'&$top=' +
+									top +
+									'&$skip=' +
+									skip +
+									'&$count=' +
+									count +
+									'&$filter=' +
+									filter +
+									'&$select=' +
+									select,
+								headers: {
+									Authorization: tokenType + ' ' + paySpaceAccessToken,
+									'Content-Type': 'application/json',
+								},
+							};
+						}
+						break;
+					default:
+						console.error('Unexpected operation:', operation);
+						break;
 				}
 
-				// Get Meta Data
-				if (operation === 'getMetadata') {
-					const company_id = this.getNodeParameter('company_id', i) as string;
-					const payspace_access_token = this.getNodeParameter('payspace_access_token', i) as string;
-					const config: AxiosRequestConfig = {
-						method: 'get',
-						maxBodyLength: Infinity,
-						url: apiUrl+'/odata/v1.1/'+company_id+'/$metadata',
-						headers: {
-							Authorization: 'Bearer ' + payspace_access_token,
-						},
-					};
-
-					const response: AxiosResponse = await axios(config);
-					responseData = [{ json: response.data }];
-					console.log(JSON.stringify(response.data));
-				}
+				const response: AxiosResponse = await axios(config);
+				responseData = [{ json: response.data }];
+				console.log(JSON.stringify(response.data));
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
