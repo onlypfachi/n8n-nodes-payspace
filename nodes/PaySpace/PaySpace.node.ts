@@ -5,7 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { /*axios,*/ /*AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
 	apiOptions,
@@ -14,7 +14,8 @@ import {
 	operationsOptions,
 	paramsOptions,
 	scopeOptions,
-} from './options';
+} from './paySpaceOptions';
+import { appendUrl } from './paySpaceUtilis';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -132,6 +133,19 @@ export class PaySpace implements INodeType {
 				description: 'Api related to operation',
 			},
 			{
+				displayName: 'ADD PARAMS',
+				name: 'addOptionalParams',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+					},
+				},
+				placeholder: 'yourTokenType',
+				description: 'Whether to add optional params?',
+			},
+			{
 				displayName: 'PARAMS',
 				name: 'params',
 				type: 'collection',
@@ -140,6 +154,7 @@ export class PaySpace implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['employee'],
+						addOptionalParams: [true],
 					},
 				},
 				options: paramsOptions,
@@ -180,17 +195,22 @@ export class PaySpace implements INodeType {
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {
-			const operation = this.getNodeParameter('operation', i) as string;
-			const environment = this.getNodeParameter('environment', i) as string;
-			const apiUrl: string =
-				environment === 'testing' ? 'https://apistaging.payspace.com' : 'https://api.payspace.com';
-			const authenticationUrl: string =
-				environment === 'testing'
-					? 'https://staging-identity.yourhcm.com/connect/token'
-					: 'https://identity.yourhcm.com/connect/token';
-
 			try {
+				const operation = this.getNodeParameter('operation', i) as string;
+				const environment = this.getNodeParameter('environment', i) as string;
+				const apiUrl: string =
+					environment === 'testing'
+						? 'https://apistaging.payspace.com'
+						: 'https://api.payspace.com';
+				const authenticationUrl: string =
+					environment === 'testing'
+						? 'https://staging-identity.yourhcm.com/connect/token'
+						: 'https://identity.yourhcm.com/connect/token';
+
 				let config: AxiosRequestConfig = {};
+				let companyId;
+				let paySpaceAccessToken;
+				let tokenType;
 
 				switch (operation) {
 					case 'getToken':
@@ -219,9 +239,9 @@ export class PaySpace implements INodeType {
 						break;
 					case 'getMetadata':
 						// Get Meta Data
-						const companyId = this.getNodeParameter('companyId', i) as number;
-						const paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-						const tokenType = this.getNodeParameter('tokenType', i) as string;
+						companyId = this.getNodeParameter('companyId', i) as number;
+						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+						tokenType = this.getNodeParameter('tokenType', i) as string;
 
 						config = {
 							method: 'get',
@@ -232,60 +252,103 @@ export class PaySpace implements INodeType {
 							},
 						};
 						break;
-					case 'Employee':
+					case 'employee':
 						const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
 						const endpoint = this.getNodeParameter('endpoint', i) as string;
 						const api = this.getNodeParameter('api', i) as string;
+						const addOptionalParams = this.getNodeParameter('addOptionalParams', i) as boolean;
+						companyId = this.getNodeParameter('companyId', i) as number;
+						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+						tokenType = this.getNodeParameter('tokenType', i) as string;
+
+						//  universal parameters
+						const orderBy = this.getNodeParameter('orderBy', i) as string;
+						const top = this.getNodeParameter('top', i) as number;
+						const skip = this.getNodeParameter('skip', i) as number;
+						const count = this.getNodeParameter('count', i) as boolean;
+						const filter = this.getNodeParameter('filter', i) as string;
+						let baseURL: string;
+
 						// Employee \ Basic Information \ Biographical \ Get a collection of employees
 						if (
-							endpointCollection === 'Basic Information' &&
-							endpoint === 'Biographical' &&
-							api === 'Get a collection of employees'
+							endpointCollection === 'basicInformation' &&
+							endpoint === 'biographical' &&
+							api === 'getACollectionOfEmployees'
 						) {
-							const companyId = this.getNodeParameter('companyId', i) as number;
-							const paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-							const tokenType = this.getNodeParameter('tokenType', i) as string;
-							const orderBy = this.getNodeParameter('orderBy', i) as string;
-							const top = this.getNodeParameter('top', i) as number;
-							const skip = this.getNodeParameter('skip', i) as number;
-							const count = this.getNodeParameter('count', i) as boolean;
-							const filter = this.getNodeParameter('filter', i) as string;
 							const select = this.getNodeParameter('select', i) as string;
+							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
 
 							config = {
 								method: 'get',
 								maxBodyLength: Infinity,
-								url:
-									apiUrl +
-									'/odata/v1.1/' +
-									companyId +
-									'/Employee?$orderby=' +
-									orderBy +
-									'&$top=' +
-									top +
-									'&$skip=' +
-									skip +
-									'&$count=' +
-									count +
-									'&$filter=' +
-									filter +
-									'&$select=' +
-									select,
+								url: addOptionalParams
+									? appendUrl(baseURL, {
+											orderBy: orderBy,
+											top: top,
+											skip: skip,
+											count: count,
+											filter: filter,
+											select: select,
+									  })
+									: baseURL,
 								headers: {
-									Authorization: tokenType + ' ' + paySpaceAccessToken,
+									Authorization: `${tokenType} ${paySpaceAccessToken}`,
 									'Content-Type': 'application/json',
+									'User-Agent': 'payspace.com',
+								},
+							};
+						} else if (
+							// Employee \ Basic Information \ Biographical \ Get a collection of employees as of an effective date
+							endpointCollection === 'basicInformation' &&
+							endpoint === 'biographical' &&
+							api === 'getACollectionOfEmployeesAsOfAnEffectiveDate'
+						) {
+							const effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
+
+							// Construct the base URL
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee/effective/${effectiveDate}?`;
+
+							console.log(baseURL);
+
+							config = {
+								method: 'get',
+								maxBodyLength: Infinity,
+								url: addOptionalParams
+									? appendUrl(baseURL, {
+											orderBy: orderBy,
+											top: top,
+											skip: skip,
+											count: count,
+											filter: filter,
+									  })
+									: baseURL,
+								headers: {
+									Authorization: `${tokenType} ${paySpaceAccessToken}`,
+									'Content-Type': 'application/json',
+									'User-Agent': 'payspace.com',
 								},
 							};
 						}
 						break;
 					default:
-						console.error('Unexpected operation:', operation);
+						responseData = [{ json: 'Unexpected operation:', operation }];
 						break;
 				}
 
-				const response: AxiosResponse = await axios(config);
-				responseData = [{ json: response.data }];
-				console.log(JSON.stringify(response.data));
+				responseData = [
+					{
+						json: {
+							success: true,
+							message: 'Successfully got data',
+							config: config,
+							url: config.url,
+							dataS: apiUrl,
+						},
+					},
+				];
+				// const response: AxiosResponse = await axios(config);
+				// responseData = [{ json: response.data }];
+				// console.log(JSON.stringify(response.data));
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
