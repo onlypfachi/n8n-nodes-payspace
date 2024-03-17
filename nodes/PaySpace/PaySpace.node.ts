@@ -133,6 +133,20 @@ export class PaySpace implements INodeType {
 				description: 'Api related to operation',
 			},
 			{
+				displayName: 'Effective Date',
+				name: 'effectiveDate',
+				type: 'dateTime',
+				default: 'getACollectionOfEmployees',
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+						api: ['getACollectionOfEmployeesAsOfAnEffectiveDate'],
+					},
+				},
+				placeholder: 'yourTokenType',
+				description: 'Api related to operation',
+			},
+			{
 				displayName: 'ADD PARAMS',
 				name: 'addOptionalParams',
 				type: 'boolean',
