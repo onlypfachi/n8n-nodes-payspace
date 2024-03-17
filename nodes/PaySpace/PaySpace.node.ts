@@ -260,13 +260,13 @@ export class PaySpace implements INodeType {
 						companyId = this.getNodeParameter('companyId', i) as number;
 						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 						tokenType = this.getNodeParameter('tokenType', i) as string;
-
 						//  universal parameters
-						const orderBy = this.getNodeParameter('orderBy', i) as string;
-						const top = this.getNodeParameter('top', i) as number;
-						const skip = this.getNodeParameter('skip', i) as number;
-						const count = this.getNodeParameter('count', i) as boolean;
-						const filter = this.getNodeParameter('filter', i) as string;
+						const orderBy = addOptionalParams? this.getNodeParameter('orderBy', i) as string: undefined;
+						const top = addOptionalParams? this.getNodeParameter('top', i) as number: undefined;
+						const skip = addOptionalParams? this.getNodeParameter('skip', i) as number: undefined;
+						const count = addOptionalParams? this.getNodeParameter('count', i) as boolean: undefined;
+						const filter = addOptionalParams? this.getNodeParameter('filter', i) as string: undefined;
+
 						let baseURL: string;
 
 						// Employee \ Basic Information \ Biographical \ Get a collection of employees
@@ -275,7 +275,8 @@ export class PaySpace implements INodeType {
 							endpoint === 'biographical' &&
 							api === 'getACollectionOfEmployees'
 						) {
-							const select = this.getNodeParameter('select', i) as string;
+
+							const select = addOptionalParams? this.getNodeParameter('select', i) as string: undefined;
 							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
 
 							config = {
@@ -303,6 +304,7 @@ export class PaySpace implements INodeType {
 							endpoint === 'biographical' &&
 							api === 'getACollectionOfEmployeesAsOfAnEffectiveDate'
 						) {
+
 							const effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
 
 							// Construct the base URL
