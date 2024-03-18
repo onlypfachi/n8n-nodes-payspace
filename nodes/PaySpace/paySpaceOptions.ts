@@ -1,4 +1,4 @@
-import { INodeProperties } from 'n8n-workflow';
+// import { INodeProperties } from 'n8n-workflow';
 
 
 export const endpointsOptions = [
@@ -323,48 +323,113 @@ export const scopeOptions = [
 	},
 ];
 
-export const paramsOptions: INodeProperties[] = [
-	{
-			displayName: 'Order By',
-			name: 'orderBy',
-			type: 'string',
-			description: 'Optional (string) - Specifies the order in which items are returned',
-			default: undefined,
-	},
-	{
-			displayName: 'Top',
-			name: 'top',
-			type: 'number',
-			description: 'Optional (integer($int32)) - Limits the number of items returned from a collection',
-			default: undefined,
-	},
-	{
-			displayName: 'Skip',
-			name: 'skip',
-			type: 'number',
-			description: 'Optional (integer($int32)) - Excludes the specified number of items of the queried collection from the result',
-			default: undefined,
-	},
-	{
-			displayName: 'Count',
-			name: 'count',
-			type: 'boolean',
-			description: 'Whether the service returns only the count of objects in the collection',
-			default: false,
-	},
-	{
-			displayName: 'Filter',
-			name: 'filter',
-			type: 'string',
-			description: 'Filter by field eg. "EmployeeNumber eq Emp01". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris',
-			default: undefined,
-	},
-	{
-			displayName: 'Select',
-			name: 'select',
-			type: 'string',
-			description: 'Optional (string) - Returns only the fields specified',
-			default: undefined,
-	},
-];
+// export const paramsOptions =
+// 	{
+// 			displayName: 'Order By',
+// 			name: 'orderBy',
+// 			type: 'string',
+// 			description: 'Optional (string) - Specifies the order in which items are returned',
+// 			default: undefined,
+// 	},
+// 	{
+// 			displayName: 'Top',
+// 			name: 'top',
+// 			type: 'number',
+// 			description: 'Optional (integer($int32)) - Limits the number of items returned from a collection',
+// 			default: undefined,
+// 	},
+// 	{
+// 			displayName: 'Skip',
+// 			name: 'skip',
+// 			type: 'number',
+// 			description: 'Optional (integer($int32)) - Excludes the specified number of items of the queried collection from the result',
+// 			default: undefined,
+// 	},
+// 	{
+// 			displayName: 'Count',
+// 			name: 'count',
+// 			type: 'boolean',
+// 			description: 'Whether the service returns only the count of objects in the collection',
+// 			default: false,
+// 	},
+// 	{
+// 			displayName: 'Filter',
+// 			name: 'filter',
+// 			type: 'string',
+// 			description: 'Filter by field eg. "EmployeeNumber eq Emp01". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris',
+// 			default: undefined,
+// 	},
+// 	{
+// 			displayName: 'Select',
+// 			name: 'select',
+// 			type: 'string',
+// 			description: 'Optional (string) - Returns only the fields specified',
+// 			default: undefined,
+// 	},
+// ;
+
+// export const additionalFieldsOptions = {
+// 	displayName: 'Optional Parameters',
+// 	name: 'optionalParameters',
+// 	type: 'collection',
+// 	placeholder: '',
+// 	default: {},
+// 	options: [
+// 		{
+// 			displayName: 'Order By',
+// 			name: 'addOrderBy',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},
+// 	paramsOptions[0],
+// 		{
+// 			displayName: 'Top',
+// 			name: 'addTop',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},paramsOptions[1],
+// 		{
+// 			displayName: 'Skip',
+// 			name: 'addSkip',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},
+// 	paramsOptions[2],
+// 		{
+// 			displayName: 'Count',
+// 			name: 'addCount',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},
+// 	paramsOptions[2],
+// 		{
+// 			displayName: 'Filter',
+// 			name: 'addFilter',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},
+// 	paramsOptions[3],
+// 		{
+// 			displayName: 'Select',
+// 			name: 'addSelect',
+// 			type: 'boolean',
+// 			default: false,
+// 			description: 'Whether specify the order in which items are returned',
+// 		},
+// 	paramsOptions[4],
+
+
+// 	],
+// 	displayOptions: { // the resources and operations to display this element with
+// 		show: {
+// 			operation: ['employee'],
+// 			apiOptions: ['getCollectionOfEmployees', 'getACollectionOfEmployeesAsOfAnEffectiveDate']
+// 		}
+// 	},
+// }
 
