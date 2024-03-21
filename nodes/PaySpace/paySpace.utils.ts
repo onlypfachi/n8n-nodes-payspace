@@ -12,12 +12,20 @@ import { IDataObject } from 'n8n-workflow';
 export const appendUrl = (baseApiUrl: string, params: IDataObject) => {
 	for (const [key, value] of Object.entries(params)) {
 		if (value !== undefined) {
-			baseApiUrl += `&${key}=${value}`;
+			baseApiUrl += `&$${key}=${value}`;
 		}
 	}
-	// Remove the leading '&' if present
-	baseApiUrl = baseApiUrl.replace(/^\&/, '');
+	// Remove the leading '&$' if present
+	baseApiUrl = baseApiUrl.replace(/^\&$/, '');
 
 	return baseApiUrl;
 };
 
+export const notEmpty = (obj: IDataObject) => {
+	for (let key in obj) {
+			if (obj.hasOwnProperty(key)) {
+					return true; // Object has at least one property
+			}
+	}
+	return false; // Object is empty
+}

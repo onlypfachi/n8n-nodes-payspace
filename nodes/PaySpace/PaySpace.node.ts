@@ -5,17 +5,18 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import {/* axios, AxiosResponse,*/ AxiosRequestConfig } from 'axios';
+import { /* axios, AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
 	apiOptions,
 	endpointCollectionsOptions,
 	endpointsOptions,
 	operationsOptions,
+	paramsOptions,
 	// paramsOptions,
 	scopeOptions,
 } from './paySpaceOptions';
-import { appendUrl } from './paySpace.utils';
+import { appendUrl, notEmpty } from './paySpace.utils';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -142,147 +143,8 @@ export class PaySpace implements INodeType {
 						api: ['getACollectionOfEmployeesAsOfAnEffectiveDate'],
 					},
 				},
-				placeholder: 'yourTokenType',
-				description: 'Api related to operation',
-			},
-			{
-				displayName: 'ADD PARAMS',
-				name: 'addOptionalParams',
-				type: 'multiOptions',
-				options: [
-					{
-						name: 'Count',
-						value: 'count'
-					},
-					{
-						name: 'Filter',
-						value: 'filter'
-					},
-					{
-						name: 'Order By',
-						value: 'orderBy'
-					},
-					{
-						name: 'Select',
-						value: 'select'
-					},
-					{
-						name: 'Skip',
-						value: 'skip'
-					},
-					{
-						name: 'Top',
-						value: 'top'
-					},
-				],
-				default: [], // Initially selected options
-				description: 'Add optional params to the request',
-				displayOptions: {
-					// the resources and operations to display this element with
-					show: {
-						operation: ['employee'],
-						api: ['getACollectionOfEmployeesAsOfAnEffectiveDate', 'getACollectionOfEmployees'],
-					},
-				},
-			},
-
-			{
-				displayName: 'Order By',
-				name: 'orderBy',
-				type: 'string',
-				description: 'Optional (string) - Specifies the order in which items are returned',
-				default: undefined,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: [ 'orderBy'],
-					},
-				},
-			},
-			{
-				displayName: 'Top',
-				name: 'top',
-				type: 'number',
-				description:
-					'Optional (integer($int32)) - Limits the number of items returned from a collection',
-				default: undefined,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: [ 'top'],
-					},
-				},
-			},
-			{
-				displayName: 'Skip',
-				name: 'skip',
-				type: 'number',
-				description:
-					'Optional (integer($int32)) - Excludes the specified number of items of the queried collection from the result',
-				default: undefined,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: ['skip'],
-					},
-				},
-			},
-			{
-				displayName: 'Count',
-				name: 'count',
-				type: 'boolean',
-				description: 'Whether the service returns only the count of objects in the collection',
-				default: false,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: [ 'count'],
-					},
-				},
-			},
-			{
-				displayName: 'Filter',
-				name: 'filter',
-				type: 'string',
-				description:
-					'Filter by field eg. "EmployeeNumber eq Emp01". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris',
-				default: undefined,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: [ 'filter'],
-					},
-				},
-			},
-			{
-				displayName: 'Select',
-				name: 'select',
-				type: 'string',
-				description: 'Optional (string) - Returns only the fields specified',
-				default: undefined,
-				displayOptions: {
-					show: {
-						apiOptions: [
-							'getACollectionOfEmployees',
-						],
-						addOptionalParams: ['select'],
-					},
-				},
+				placeholder: '',
+				description: 'The specified effective date',
 			},
 			{
 				displayName: 'Token Type',
@@ -309,6 +171,18 @@ export class PaySpace implements INodeType {
 				},
 				placeholder: 'y0urP4y5p4c34cc355T0k3nFr0mG3tT0k3nN0d3...',
 				description: 'The Authorization bearer token',
+			},
+			{
+				displayName: 'Additional Optional Params',
+				name: 'additionalFields',
+				placeholder: 'Add optional params',
+				type: 'fixedCollection',
+				default: {},
+				typeOptions: {
+					multipleValues: false,
+				},
+				description: 'PARAMS',
+				options: paramsOptions,
 			},
 		],
 	};
@@ -389,27 +263,10 @@ export class PaySpace implements INodeType {
 						const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
 						const endpoint = this.getNodeParameter('endpoint', i) as string;
 						const api = this.getNodeParameter('api', i) as string;
-						const addOptionalParams = (this.getNodeParameter('addOptionalParams', i) as Array<string>) || [];
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 						companyId = this.getNodeParameter('companyId', i) as number;
 						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 						tokenType = this.getNodeParameter('tokenType', i) as string;
-
-						//  universal parameters
-						const orderBy = addOptionalParams.includes('orderBy')
-							? (this.getNodeParameter('orderBy', i) as string)
-							: '';
-						const top = addOptionalParams.includes('top')
-							? (this.getNodeParameter('top', i) as number)
-							: 100;
-						const skip = addOptionalParams.includes('skip')
-							? (this.getNodeParameter('skip', i) as number)
-							: 0;
-						const count = addOptionalParams.includes('count')
-							? (this.getNodeParameter('count', i) as boolean)
-							: false;
-						const filter = addOptionalParams.includes('filter')
-							? (this.getNodeParameter('filter', i) as string)
-							: '';
 
 						let baseURL;
 
@@ -419,25 +276,13 @@ export class PaySpace implements INodeType {
 							endpoint === 'biographical' &&
 							api === 'getACollectionOfEmployees'
 						) {
-							const select = addOptionalParams.includes('select')
-								? (this.getNodeParameter('select', i) as string)
-								: undefined;
 							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
 
 							config = {
 								method: 'get',
 								maxBodyLength: Infinity,
-								url: addOptionalParams.length > 0
-									? appendUrl(baseURL, {
-											orderBy: orderBy,
-											top: top,
-											skip: skip,
-											count: count,
-											filter: filter,
-											select: select,
-									  })
-									: baseURL,
-								params: addOptionalParams,
+								url: notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL,
+								params: additionalFields,
 								headers: {
 									Authorization: `${tokenType} ${paySpaceAccessToken}`,
 									'Content-Type': 'application/json',
@@ -458,16 +303,8 @@ export class PaySpace implements INodeType {
 							config = {
 								method: 'get',
 								maxBodyLength: Infinity,
-
-								url: addOptionalParams.length > 0
-									? appendUrl(baseURL, {
-											orderBy: orderBy,
-											top: top,
-											skip: skip,
-											count: count,
-											filter: filter,
-									  })
-									: baseURL,
+								url: notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL,
+								params: additionalFields,
 								headers: {
 									Authorization: `${tokenType} ${paySpaceAccessToken}`,
 									'Content-Type': 'application/json',
