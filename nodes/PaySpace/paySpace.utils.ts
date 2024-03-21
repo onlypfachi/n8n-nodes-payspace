@@ -16,7 +16,7 @@ export const appendUrl = (baseApiUrl: string, params: IDataObject) => {
 		}
 	}
 	// Remove the leading '&' if present
-	// baseURL = baseURL.replace(/^\&/, '');
+	baseApiUrl = baseApiUrl.replace(/^\&/, '');
 
 	return baseApiUrl;
 };
