@@ -20,13 +20,13 @@ import { appendUrl, notEmpty } from './paySpace.utils';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: '={{$parameter["api"]}}' || 'PaySpace',
+		displayName: 'PaySpace',
 
 		name: 'paySpace',
 		icon: 'file:ps.svg',
 		group: ['input'],
 		version: 1,
-		subtitle: '={{$parameter["operation"]}}',
+		subtitle: `={{$parameter["operation"] === "getToken" || $parameter["operation"] === "getMetadata" ? $parameter["operation"] : $parameter["api"]}}`,
 		description: 'Use PaySpace API to manage your PaySpace account',
 		defaults: {
 			name: 'PaySpace',
@@ -181,8 +181,14 @@ export class PaySpace implements INodeType {
 				typeOptions: {
 					multipleValues: false,
 				},
-				description: 'PARAMS',
-				options: paramsOptions,
+				description: 'Optional query parameters',
+				options: [
+					{
+						name: 'params',
+						displayName: 'Parameters',
+						values: paramsOptions,
+					},
+				],
 			},
 		],
 	};
@@ -263,7 +269,7 @@ export class PaySpace implements INodeType {
 						const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
 						const endpoint = this.getNodeParameter('endpoint', i) as string;
 						const api = this.getNodeParameter('api', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as any;
 						companyId = this.getNodeParameter('companyId', i) as number;
 						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 						tokenType = this.getNodeParameter('tokenType', i) as string;
@@ -281,7 +287,9 @@ export class PaySpace implements INodeType {
 							config = {
 								method: 'get',
 								maxBodyLength: Infinity,
-								url: notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL,
+								url: notEmpty(additionalFields.params)
+									? appendUrl(baseURL, additionalFields.params)
+									: baseURL,
 								params: additionalFields,
 								headers: {
 									Authorization: `${tokenType} ${paySpaceAccessToken}`,
@@ -303,8 +311,10 @@ export class PaySpace implements INodeType {
 							config = {
 								method: 'get',
 								maxBodyLength: Infinity,
-								url: notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL,
-								params: additionalFields,
+								url: notEmpty(additionalFields.params)
+									? appendUrl(baseURL, additionalFields.params)
+									: baseURL,
+								params: additionalFields.Parameters,
 								headers: {
 									Authorization: `${tokenType} ${paySpaceAccessToken}`,
 									'Content-Type': 'application/json',

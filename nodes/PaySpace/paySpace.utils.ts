@@ -10,22 +10,28 @@ import { IDataObject } from 'n8n-workflow';
  * Returns the base URL with the query string appended.
  */
 export const appendUrl = (baseApiUrl: string, params: IDataObject) => {
+	let urlParams = '';
 	for (const [key, value] of Object.entries(params)) {
-		if (value !== undefined) {
-			baseApiUrl += `&$${key}=${value}`;
+		if (value !== undefined && value !== '') {
+			urlParams += `&$${key}=${value}`;
 		}
 	}
-	// Remove the leading '&$' if present
-	baseApiUrl = baseApiUrl.replace(/^\&$/, '');
+	// Remove the leading '&'
+	urlParams = urlParams.replace(/^\&/, '');
 
-	return baseApiUrl;
+	// Append the parameters to the base URL
+	const updatedUrl = baseApiUrl.includes('?')
+		? `${baseApiUrl}${urlParams}`
+		: `${baseApiUrl}?${urlParams}`;
+
+	return updatedUrl;
 };
 
 export const notEmpty = (obj: IDataObject) => {
 	for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-					return true; // Object has at least one property
-			}
+		if (obj.hasOwnProperty(key)) {
+			return true; // Object has at least one property
+		}
 	}
 	return false; // Object is empty
-}
+};
