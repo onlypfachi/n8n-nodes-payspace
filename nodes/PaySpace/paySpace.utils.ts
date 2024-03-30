@@ -1,4 +1,5 @@
-import { IDataObject } from 'n8n-workflow';
+import { IDataObject, INodeProperties } from 'n8n-workflow';
+import { biographicalApiOptions, employeeAddressApiOptions, taxProfilesApiOptions } from './options/employeeOptions';
 
 /**
  * Appends query parameters to a base URL.
@@ -35,3 +36,42 @@ export const notEmpty = (obj: IDataObject) => {
 	}
 	return false; // Object is empty
 };
+
+export const dynamicDisplayName = (api: string) => {
+	let displayName = '';
+	if (api === 'getASingleEmployeeRecord') {
+			displayName = 'Employee ID';
+	} else if (api === 'getACollectionOfEmployeesAsOfAnEffectiveDate') {
+			displayName = 'Effective Date';
+	}
+	else if (api === 'getAnEmployeeAddress') {
+			displayName = 'EmployeeNumber';
+	}
+	else if (api === 'updateASingleEmployeeAddress') {
+			displayName = 'AddressId';
+	}
+	return displayName;
+};
+
+
+export const getApiOptions = (endpointCollectionsOptions: string): INodeProperties[] => {
+	let options: any;
+
+	switch (endpointCollectionsOptions) {
+			case 'biographical':
+					options = biographicalApiOptions;
+					break;
+			case 'employeeAddress':
+					options = employeeAddressApiOptions;
+					break;
+			case 'taxProfiles':
+					options = taxProfilesApiOptions;;
+					break;
+			default:
+					options = [];
+					break;
+	}
+
+	return options;
+};
+

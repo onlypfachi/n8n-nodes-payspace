@@ -5,18 +5,17 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { /* axios, AxiosResponse,*/ AxiosRequestConfig } from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
-	apiOptions,
 	endpointCollectionsOptions,
 	endpointsOptions,
 	operationsOptions,
 	paramsOptions,
 	// paramsOptions,
 	scopeOptions,
-} from './paySpaceOptions';
-import { appendUrl, notEmpty } from './paySpace.utils';
+} from './options/paySpaceOptions';
+import { appendUrl, dynamicDisplayName, getApiOptions, notEmpty } from './paySpace.utils';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -122,8 +121,8 @@ export class PaySpace implements INodeType {
 				displayName: 'Api',
 				name: 'api',
 				type: 'options',
-				options: apiOptions,
-				default: 'getACollectionOfEmployees',
+				options: getApiOptions(`$parameter[endpoint]`),
+				default: '',
 				displayOptions: {
 					show: {
 						operation: ['employee'],
@@ -132,20 +131,7 @@ export class PaySpace implements INodeType {
 				placeholder: 'yourTokenType',
 				description: 'Api related to operation',
 			},
-			{
-				displayName: 'Effective Date',
-				name: 'effectiveDate',
-				type: 'dateTime',
-				default: 'getACollectionOfEmployees',
-				displayOptions: {
-					show: {
-						operation: ['employee'],
-						api: ['getACollectionOfEmployeesAsOfAnEffectiveDate'],
-					},
-				},
-				placeholder: '',
-				description: 'The specified effective date',
-			},
+
 			{
 				displayName: 'Token Type',
 				name: 'tokenType',
@@ -167,10 +153,43 @@ export class PaySpace implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['getMetadata', 'employee'],
+						api: ['getACollectionOfEmployees'],
 					},
 				},
 				placeholder: 'y0urP4y5p4c34cc355T0k3nFr0mG3tT0k3nN0d3...',
 				description: 'The Authorization bearer token',
+			},
+			{
+				displayName: dynamicDisplayName(`$parameter["api"]`),
+				name: 'dynamicParameter',
+				type: 'string',
+				default: 'this.api.parameter',
+				displayOptions: {
+					show: {
+						operation: ['employee'],
+						api: [
+							'getACollectionOfEmployeesAsOfAnEffectiveDate',
+							'uploadEmployeePhoto',
+							'downloadEmployeePhoto',
+							'createASingleEmployeeRecord',
+							'getASingleEmployeeRecord',
+						],
+					},
+				},
+				placeholder: '""',
+			},
+			{
+				displayName: 'Data (JSON)',
+				name: 'bodyData',
+				type: 'json',
+				default: '',
+				description: 'Body data that needs to be passed in the URL as body JSON',
+				displayOptions: {
+					// the resources and operations to display this element with
+					show: {
+						api: ['updateASingleEmployeeAddressRecord', 'createASingleEmployeeRecord'],
+					},
+				},
 			},
 			{
 				displayName: 'Additional Optional Params',
@@ -216,7 +235,6 @@ export class PaySpace implements INodeType {
 				let companyId;
 				let paySpaceAccessToken;
 				let tokenType;
-				let addOptionalParams;
 				const getMetadataResponse = {
 					json: {
 						success: true,
@@ -226,125 +244,174 @@ export class PaySpace implements INodeType {
 					},
 				};
 
-				switch (operation) {
-					case 'getToken':
-						// Get access token
-						let scope = this.getNodeParameter('client_scope', i) as string;
-						const client_id = credentials.client_id;
-						const client_secret = credentials.client_secret;
+				if (operation === 'getToken') {
+					// Get access token
+					let scope = this.getNodeParameter('client_scope', i) as string;
+					const client_id = credentials.client_id;
+					const client_secret = credentials.client_secret;
 
-						const data: string = qs.stringify({
-							client_id: client_id,
-							client_secret: client_secret,
-							scope: scope,
-						});
+					const data: string = qs.stringify({
+						client_id: client_id,
+						client_secret: client_secret,
+						scope: scope,
+					});
 
-						config = {
-							method: 'post',
-							maxBodyLength: Infinity,
-							url: authenticationUrl,
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded',
-								'User-Agent': 'payspace.com',
-							},
-							data: data,
-						};
-						break;
-					case 'getMetadata':
-						// Get Meta Data
-						companyId = this.getNodeParameter('companyId', i) as number;
-						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-						tokenType = this.getNodeParameter('tokenType', i) as string;
+					config = {
+						method: 'post',
+						maxBodyLength: Infinity,
+						url: authenticationUrl,
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'User-Agent': 'payspace.com',
+						},
+						data: data,
+					};
+				} else if (operation === 'getMetadata') {
+					// Get Meta Data
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+					tokenType = this.getNodeParameter('tokenType', i) as string;
 
-						config = {
-							method: 'get',
-							maxBodyLength: Infinity,
-							url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
-							headers: {
-								Authorization: tokenType + ' ' + paySpaceAccessToken,
-							},
-						};
-						break;
-					case 'employee':
-						const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
-						const endpoint = this.getNodeParameter('endpoint', i) as string;
-						const api = this.getNodeParameter('api', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i) as any;
-						companyId = this.getNodeParameter('companyId', i) as number;
-						paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-						tokenType = this.getNodeParameter('tokenType', i) as string;
+					config = {
+						method: 'get',
+						maxBodyLength: Infinity,
+						url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
+						headers: {
+							Authorization: tokenType + ' ' + paySpaceAccessToken,
+						},
+					};
+				} else if (operation === 'employee') {
+					// const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
+					// const endpoint = this.getNodeParameter('endpoint', i) as string;
+					// const api = this.getNodeParameter('api', i) as string;
+					// const additionalFields = this.getNodeParameter('additionalFields', i) as any;
+					// companyId = this.getNodeParameter('companyId', i) as number;
+					// paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+					// tokenType = this.getNodeParameter('tokenType', i) as string;
+					// let baseURL: string;
 
-						let baseURL;
+					const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
+					const endpoint = this.getNodeParameter('endpoint', i) as string;
+					const api = this.getNodeParameter('api', i) as string;
+					const additionalFields = this.getNodeParameter('additionalFields', i) as any;
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+					tokenType = this.getNodeParameter('tokenType', i) as string;
+					let baseURL: string;
 
-						// Employee \ Basic Information \ Biographical \ Get a collection of employees
-						if (
-							endpointCollection === 'basicInformation' &&
-							endpoint === 'biographical' &&
-							api === 'getACollectionOfEmployees'
-						) {
+					switch (api) {
+						case 'getACollectionOfEmployees':
 							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
-
-							config = {
-								method: 'get',
-								maxBodyLength: Infinity,
-								url: notEmpty(additionalFields.params)
-									? appendUrl(baseURL, additionalFields.params)
-									: baseURL,
-								params: additionalFields,
-								headers: {
-									Authorization: `${tokenType} ${paySpaceAccessToken}`,
-									'Content-Type': 'application/json',
-									'User-Agent': 'payspace.com',
-								},
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
 							};
-						} else if (
-							// Employee \ Basic Information \ Biographical \ Get a collection of employees as of an effective date
-							endpointCollection === 'basicInformation' &&
-							endpoint === 'biographical' &&
-							api === 'getACollectionOfEmployeesAsOfAnEffectiveDate'
-						) {
-							const effectiveDate = this.getNodeParameter('effectiveDate', i) as string; //TODO: convert to date AND get the right format
-
-							// Construct the base URL
+							break;
+						case 'getACollectionOfEmployeesAsOfAnEffectiveDate':
+							const effectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee/effective/${effectiveDate}?`;
-
-							config = {
-								method: 'get',
-								maxBodyLength: Infinity,
-								url: notEmpty(additionalFields.params)
-									? appendUrl(baseURL, additionalFields.params)
-									: baseURL,
-								params: additionalFields.Parameters,
-								headers: {
-									Authorization: `${tokenType} ${paySpaceAccessToken}`,
-									'Content-Type': 'application/json',
-									'User-Agent': 'payspace.com',
-								},
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
 							};
-						}
-						break;
-					default:
-						responseData = [{ json: 'Unexpected operation:', operation }];
-						break;
+							break;
+						case 'getASingleEmployeeRecord':
+							const EmployeeIdSingle = this.getNodeParameter('dynamicParameter', i) as string;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${EmployeeIdSingle})`;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'createASingleEmployeeRecord':
+							const dataCreate = this.getNodeParameter('bodyData', i) as IDataObject;
+							const EmployeeIdCreate = this.getNodeParameter('dynamicParameter', i) as string;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${EmployeeIdCreate})`;
+							config.method = 'patch';
+							config.data = dataCreate;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'UpdateASingleEmployeeRecord':
+							const dataUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee`;
+							config.method = 'patch';
+							config.data = dataUpdate;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'downloadEmployeePhoto':
+							const FormDataDownload = require('form-data');
+							const EmployeeIdDownload = this.getNodeParameter('dynamicParameter', i) as string;
+							const baseURLDownload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${EmployeeIdDownload}/image/download`;
+							const dataDownload = new FormDataDownload();
+							config.url = baseURLDownload;
+							config.data = dataDownload;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								...dataDownload.getHeaders(),
+							};
+							break;
+						case 'uploadEmployeePhoto':
+							const FormDataUpload = require('form-data');
+							const EmployeeIdUpload = this.getNodeParameter('dynamicParameter', i) as string;
+							const baseURLUpload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${EmployeeIdUpload}/image/upload`;
+							const dataUpload = new FormDataUpload();
+							config.url = baseURLUpload;
+							config.data = dataUpload;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								...dataUpload.getHeaders(),
+							};
+							break;
+						case 'getAnEmployeeAddress':
+							const EmployeeNumber = this.getNodeParameter('dynamicParameter', i) as string;
+						 baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
+							config.url = appendUrl(baseURL, additionalFields.params);
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'updateASingleEmployeeAddressRecord':
+							const AddressId = this.getNodeParameter('dynamicParameter', i) as string;
+						 	baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${AddressId})`;
+							const dataAddressUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = appendUrl(baseURL, additionalFields.params);
+							config.method = 'patch';
+							config.data = dataAddressUpdate; //see "EmployeeAddress" in metadata endpoint for available fields
+							config.headers = {
+								'Content-Type': 'application/json',
+							};
+							break;
+							case 'getACollectionOfEmploymentStatus':
+								const data = this.getNodeParameter('bodyData', i) as IDataObject;
+								 baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
+								config.url = baseURL;
+								config.method = 'get';
+								config.headers = {
+									Authorization: `Bearer ${paySpaceAccessToken}`,
+										'content-type': 'application/json',
+								};
+								config.data = data;
+								break;
+						default:
+							// Handle default case or raise an error if necessary
+							break;
+					}
+				} else if (operation === 'company') {
+				} else if (operation === 'lookUpValue') {
+				} else if (operation === 'fileUpload') {
+				} else if (operation === 'webhooks') {
 				}
+
+				const response = config; /*: AxiosResponse = await axios(config)*/
 				responseData =
-					operation === 'getMetadata'
-						? getMetadataResponse
-						: [
-								{
-									json: {
-										success: true,
-										message: 'Successfully got data',
-										config: config,
-										url: config.url,
-										dataS: apiUrl,
-										selectedFields: addOptionalParams,
-									},
-								},
-						  ];
-				// const response: AxiosResponse = operation==='getMetadata'? getMetadataResponse: await axios(config);
-				// responseData = [{ json: response.data }];
-				// console.log(JSON.stringify(response.data));
+					operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
