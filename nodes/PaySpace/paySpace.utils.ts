@@ -1,5 +1,9 @@
 import { IDataObject, INodeProperties } from 'n8n-workflow';
-import { biographicalApiOptions, employeeAddressApiOptions, taxProfilesApiOptions } from './options/employeeOptions';
+import {
+	biographicalApiOptions,
+	employeeAddressApiOptions,
+	taxProfilesApiOptions,
+} from './options/employeeOptions';
 
 /**
  * Appends query parameters to a base URL.
@@ -38,40 +42,76 @@ export const notEmpty = (obj: IDataObject) => {
 };
 
 export const dynamicDisplayName = (api: string) => {
-	let displayName = '';
+	let displayName: string = '';
 	if (api === 'getASingleEmployeeRecord') {
-			displayName = 'Employee ID';
-	} else if (api === 'getACollectionOfEmployeesAsOfAnEffectiveDate') {
-			displayName = 'Effective Date';
-	}
-	else if (api === 'getAnEmployeeAddress') {
-			displayName = 'EmployeeNumber';
-	}
-	else if (api === 'updateASingleEmployeeAddress') {
-			displayName = 'AddressId';
+		displayName = 'Employee ID';
+	} else if (
+		api === 'getACollectionOfEmployeesAsOfAnEffectiveDate' ||
+		api === 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate'
+	) {
+		displayName = 'Effective Date';
+	} else if (api === 'getAnEmployeeAddress') {
+		displayName = 'Employee Number';
+	} else if (api === 'updateASingleEmployeeAddressRecord') {
+		displayName = 'Address ID';
+	} else if (api === 'getASingleEmploymentStatusRecord') {
+		displayName = 'Status ID';
+	} else if (
+		api === 'updateASingleEmploymentStatusRecord' ||
+		api === 'employmentStatusEmployeeTermination' ||
+		api === 'employmentStatusReinstateWithNewTaxRecord' ||
+		api === 'employmentStatusReinstateSameRecord'
+	) {
+		displayName = 'Employment Status Id';
 	}
 	return displayName;
 };
-
 
 export const getApiOptions = (endpointCollectionsOptions: string): INodeProperties[] => {
 	let options: any;
 
 	switch (endpointCollectionsOptions) {
-			case 'biographical':
-					options = biographicalApiOptions;
-					break;
-			case 'employeeAddress':
-					options = employeeAddressApiOptions;
-					break;
-			case 'taxProfiles':
-					options = taxProfilesApiOptions;;
-					break;
-			default:
-					options = [];
-					break;
+		case 'biographical':
+			options = biographicalApiOptions;
+			break;
+		case 'employeeAddress':
+			options = employeeAddressApiOptions;
+			break;
+		case 'taxProfiles':
+			options = taxProfilesApiOptions;
+			break;
+		default:
+			options = [];
+			break;
 	}
 
 	return options;
 };
 
+export const getBodyDataPlaceholder = (api: string) => {
+	let bodyDataPlaceholder: string = '';
+
+	switch (api) {
+		case 'createASingleEmployeeRecord':
+			bodyDataPlaceholder = '{}';
+			break;
+		case 'employmentStatusReinstateSameRecord':
+			bodyDataPlaceholder =
+				'"EmploymentAction": "reinstate this employee resuming this tax record" //Required';
+			break;
+		case 'employmentStatusEmployeeTermination':
+			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t// Required\n    "TerminationReason": "string",\t\t\t\t\t\t// Required\n    "EmploymentAction": "string",\t\t\t\t\t\t// Required\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t// Required\n`;
+			break;
+		case 'employmentStatusReinstateWithNewTaxRecord':
+			bodyDataPlaceholder = `\n    "EmploymentAction": "reinstate this employee starting a new tax record",\t//Required\n\t"EmploymentDate": "2019-01-01"\t\t\t\t\t\t\t\t\t\t\t\t//Required\n}`;
+			break;
+		case 'employmentStatusEmployeeTermination':
+			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t// Required\n    "TerminationReason": "string",\t\t\t\t\t\t// Required\n    "EmploymentAction": "string",\t\t\t\t\t\t// Required\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t// Required\n`;
+			break;
+		default:
+			bodyDataPlaceholder = '{}';
+			break;
+	}
+
+	return bodyDataPlaceholder;
+};

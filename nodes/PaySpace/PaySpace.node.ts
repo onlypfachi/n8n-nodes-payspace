@@ -15,7 +15,13 @@ import {
 	// paramsOptions,
 	scopeOptions,
 } from './options/paySpaceOptions';
-import { appendUrl, dynamicDisplayName, getApiOptions, notEmpty } from './paySpace.utils';
+import {
+	appendUrl,
+	dynamicDisplayName,
+	getApiOptions,
+	getBodyDataPlaceholder,
+	notEmpty,
+} from './paySpace.utils';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -173,6 +179,10 @@ export class PaySpace implements INodeType {
 							'downloadEmployeePhoto',
 							'createASingleEmployeeRecord',
 							'getASingleEmployeeRecord',
+							'employmentStatusReinstateSameRecord',
+							'employmentStatusReinstateWithNewTaxRecord',
+							'deleteASingleEmploymentStatusRecord',
+							'employmentStatusEmployeeTermination',
 						],
 					},
 				},
@@ -183,14 +193,20 @@ export class PaySpace implements INodeType {
 				name: 'bodyData',
 				type: 'json',
 				default: '',
+				placeholder: getBodyDataPlaceholder(`$parameter["api"]`),
 				description: 'Body data that needs to be passed in the URL as body JSON',
 				displayOptions: {
 					// the resources and operations to display this element with
 					show: {
-						api: ['updateASingleEmployeeAddressRecord', 'createASingleEmployeeRecord'],
+						api: [
+							'updateASingleEmployeeAddressRecord',
+							'createASingleEmployeeRecord',
+							'employmentStatusReinstateSameRecord',
+						],
 					},
 				},
 			},
+
 			{
 				displayName: 'Additional Optional Params',
 				name: 'additionalFields',
@@ -370,7 +386,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getAnEmployeeAddress':
 							const EmployeeNumber = this.getNodeParameter('dynamicParameter', i) as string;
-						 baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
 							config.url = appendUrl(baseURL, additionalFields.params);
 							config.headers = {
 								Authorization: `Bearer ${paySpaceAccessToken}`,
@@ -379,7 +395,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'updateASingleEmployeeAddressRecord':
 							const AddressId = this.getNodeParameter('dynamicParameter', i) as string;
-						 	baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${AddressId})`;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${AddressId})`;
 							const dataAddressUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
 							config.url = appendUrl(baseURL, additionalFields.params);
 							config.method = 'patch';
@@ -388,17 +404,116 @@ export class PaySpace implements INodeType {
 								'Content-Type': 'application/json',
 							};
 							break;
-							case 'getACollectionOfEmploymentStatus':
-								const data = this.getNodeParameter('bodyData', i) as IDataObject;
-								 baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
-								config.url = baseURL;
-								config.method = 'get';
-								config.headers = {
-									Authorization: `Bearer ${paySpaceAccessToken}`,
-										'content-type': 'application/json',
-								};
-								config.data = data;
-								break;
+						case 'getACollectionOfEmploymentStatus':
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
+							config.url = appendUrl(baseURL, additionalFields.params);
+							config.method = 'get';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'getASingleEmploymentStatusRecord':
+							const StatusId = this.getNodeParameter('dynamicParameter', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${StatusId})`; //
+							config.method = 'get';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate':
+							const EffectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
+							config.url = appendUrl(
+								`${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${EffectiveDate}`,
+								additionalFields.params,
+							); //
+							config.method = 'get';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'getACollectionOfAllEmploymentStatuses':
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/all?`;
+							config.url = appendUrl(baseURL, additionalFields.params); //
+							config.method = 'get';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'createASingleEmploymentStatusRecord':
+							const EmployeeEmploymentStatus = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus`;
+							config.method = 'post';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							config.data = EmployeeEmploymentStatus; //see "EmployeeEmploymentStatus" in metadata endpoint for available fields
+							break;
+						case 'updateASingleEmploymentStatusRecord':
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							const EmploymentStatusId = this.getNodeParameter('dynamicParameter', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${EmploymentStatusId})`;
+							config.maxBodyLength = Infinity;
+							config.method = 'patch';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							//see "EmployeeEmploymentStatus" in metadata endpoint for available fields
+							break;
+						case 'employmentStatusEmployeeTermination':
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							this.getNodeParameter('dynamicParameter', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
+								this.getNodeParameter('dynamicParameter', i) as string
+							})`;
+							config.maxBodyLength = Infinity;
+							config.method = 'patch';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'employmentStatusReinstateSameRecord':
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+
+							config.maxBodyLength = Infinity;
+							config.method = 'patch';
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
+								this.getNodeParameter('dynamicParameter', i) as string
+							})`;
+							break;
+						case 'employmentStatusReinstateWithNewTaxRecord':
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.maxBodyLength = Infinity;
+							config.method = 'patch';
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
+								this.getNodeParameter('dynamicParameter', i) as string
+							})`;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
+						case 'deleteASingleEmploymentStatusRecord':
+							config.maxBodyLength = Infinity;
+							config.method = 'delete';
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
+								this.getNodeParameter('dynamicParameter', i) as string
+							})`;
+							config.headers = {
+								Authorization: `Bearer ${paySpaceAccessToken}`,
+								'content-type': 'application/json',
+							};
+							break;
 						default:
 							// Handle default case or raise an error if necessary
 							break;
