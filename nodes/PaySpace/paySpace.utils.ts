@@ -1,7 +1,8 @@
-import { IDataObject, INodeProperties } from 'n8n-workflow';
+import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
 import {
 	biographicalApiOptions,
 	employeeAddressApiOptions,
+	basicInformationEndpointsCollectionOptions,
 	taxProfilesApiOptions,
 } from './options/employeeOptions';
 
@@ -42,35 +43,35 @@ export const notEmpty = (obj: IDataObject) => {
 };
 
 export const dynamicDisplayName = (api: string) => {
-	let displayName: string = '';
 	if (api === 'getASingleEmployeeRecord') {
-		displayName = 'Employee ID';
+		return 'Employee ID';
 	} else if (
 		api === 'getACollectionOfEmployeesAsOfAnEffectiveDate' ||
 		api === 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate'
 	) {
-		displayName = 'Effective Date';
+		return 'Effective Date';
 	} else if (api === 'getAnEmployeeAddress') {
-		displayName = 'Employee Number';
+		return 'Employee Number';
 	} else if (api === 'updateASingleEmployeeAddressRecord') {
-		displayName = 'Address ID';
+		return 'Address ID';
 	} else if (api === 'getASingleEmploymentStatusRecord') {
-		displayName = 'Status ID';
+		return 'Status ID';
 	} else if (
 		api === 'updateASingleEmploymentStatusRecord' ||
 		api === 'employmentStatusEmployeeTermination' ||
 		api === 'employmentStatusReinstateWithNewTaxRecord' ||
 		api === 'employmentStatusReinstateSameRecord'
 	) {
-		displayName = 'Employment Status Id';
+		return 'Employment Status Id';
+	} else {
+		return 'Employment Status';
 	}
-	return displayName;
 };
 
-export const getApiOptions = (endpointCollectionsOptions: string): INodeProperties[] => {
+export const getApiOptions = (endpoint: string):	INodePropertyOptions[] => {
 	let options: any;
 
-	switch (endpointCollectionsOptions) {
+	switch (endpoint) {
 		case 'biographical':
 			options = biographicalApiOptions;
 			break;
@@ -88,7 +89,7 @@ export const getApiOptions = (endpointCollectionsOptions: string): INodeProperti
 	return options;
 };
 
-export const getBodyDataPlaceholder = (api: string) => {
+export const getBodyDataPlaceholder = (api: string): string => {
 	let bodyDataPlaceholder: string = '';
 
 	switch (api) {
@@ -109,9 +110,20 @@ export const getBodyDataPlaceholder = (api: string) => {
 			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t// Required\n    "TerminationReason": "string",\t\t\t\t\t\t// Required\n    "EmploymentAction": "string",\t\t\t\t\t\t// Required\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t// Required\n`;
 			break;
 		default:
-			bodyDataPlaceholder = '{}';
+			bodyDataPlaceholder = 'no preview body';
 			break;
 	}
 
 	return bodyDataPlaceholder;
+};
+
+export const getEndpointOptions = (endpointCollection: string): INodePropertyOptions[] => {
+	switch (endpointCollection) {
+		case 'basicInformation':
+			return basicInformationEndpointsCollectionOptions;
+		case 'payrollProcessing':
+			return basicInformationEndpointsCollectionOptions;
+		default:
+			return [];
+	}
 };

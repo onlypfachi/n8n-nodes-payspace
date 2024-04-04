@@ -1,3 +1,138 @@
+export const employeeEndpointCollectionsOptions = [
+	{
+		name: 'Basic Information',
+		value: 'basicInformation',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Costing',
+		value: 'costing',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Leave',
+		value: 'leave',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Other',
+		value: 'other',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Payroll Processing',
+		value: 'payrollProcessing',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Payroll Results',
+		value: 'payrollResults',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Performance Management',
+		value: 'performanceManagement',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Skills',
+		value: 'skills',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+	{
+		name: 'Suspension',
+		value: 'suspension',
+		displayOptions: {
+			show: {
+				operation: ['employee'],
+			},
+		},
+	},
+];
+
+export const basicInformationEndpointsCollectionOptions = [
+	{
+		name: 'Assets',
+		value: 'assets',
+	},
+	{
+		name: 'Attachments',
+		value: 'attachments',
+	},
+	{
+		name: 'Banking Details',
+		value: 'bankingDetails',
+	},
+	{
+		name: 'Biographical',
+		value: 'biographical',
+	},
+	{
+		name: 'Dependants',
+		value: 'dependants',
+	},
+	{
+		name: 'Employee Custom Forms',
+		value: 'employeeCustomForms',
+	},
+	{
+		name: 'Employee Inbox',
+		value: 'employeeInbox',
+	},
+	{
+		name: 'EmployeeAddress',
+		value: 'employeeAddress',
+	},
+	{
+		name: 'Incident Management',
+		value: 'incidentManagement',
+	},
+	{
+		name: 'Positions',
+		value: 'positions',
+	},
+	{
+		name: 'Project Details',
+		value: 'projectDetails',
+	},
+	{
+		name: 'Tax Profile',
+		value: 'taxProfile',
+	},
+];
+
 export const biographicalApiOptions = [
 	{
 		name: 'Create a Single Employee Record',
@@ -43,42 +178,42 @@ export const employeeAddressApiOptions = [
 export const taxProfilesApiOptions = [
 	{
 		name: 'Get a Collection of Employment Statuses',
-		value: 'getACollectionOfEmploymentStatuses'
+		value: 'getACollectionOfEmploymentStatuses',
 	},
 	{
 		name: 'Get a Single Employment Status Record',
-		value: 'getASingleEmploymentStatusRecord'
+		value: 'getASingleEmploymentStatusRecord',
 	},
 	{
 		name: 'Get a Collection of Employment Statuses as of an Effective Date',
-		value: 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate'
+		value: 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
 	},
 	{
 		name: 'Get a Collection of All Employment Statuses',
-		value: 'getACollectionOfAllEmploymentStatuses'
+		value: 'getACollectionOfAllEmploymentStatuses',
 	},
 	{
 		name: 'Create a Single Employment Status Record',
-		value: 'createASingleEmploymentStatusRecord'
+		value: 'createASingleEmploymentStatusRecord',
 	},
 	{
 		name: 'Update a Single Employment Status Record',
-		value: 'updateASingleEmploymentStatusRecord'
+		value: 'updateASingleEmploymentStatusRecord',
 	},
 	{
 		name: 'EmploymentStatus: EmployeeTermination',
-		value: 'employmentStatusEmployeeTermination'
+		value: 'employmentStatusEmployeeTermination',
 	},
 	{
 		name: 'EmploymentStatus: Reinstate Same Record',
-		value: 'employmentStatusReinstateSameRecord'
+		value: 'employmentStatusReinstateSameRecord',
 	},
 	{
 		name: 'EmploymentStatus: Reinstate With New Tax Record',
-		value: 'employmentStatusReinstateWithNewTaxRecord'
+		value: 'employmentStatusReinstateWithNewTaxRecord',
 	},
 	{
 		name: 'Delete a Single Employment Status Record',
-		value: 'deleteASingleEmploymentStatusRecord'
-	}
-]
+		value: 'deleteASingleEmploymentStatusRecord',
+	},
+];

@@ -4,29 +4,30 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	INodeProperties,
+	INodePropertyOptions,
 } from 'n8n-workflow';
-import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
-	endpointCollectionsOptions,
-	endpointsOptions,
+	dynamicDisplayNameApiDisplayArray,
 	operationsOptions,
 	paramsOptions,
 	// paramsOptions,
 	scopeOptions,
 } from './options/paySpaceOptions';
+import { employeeEndpointCollectionsOptions } from './options/employeeOptions';
 import {
 	appendUrl,
 	dynamicDisplayName,
 	getApiOptions,
 	getBodyDataPlaceholder,
-	notEmpty,
+	// notEmpty,
+	getEndpointOptions,
 } from './paySpace.utils';
-
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PaySpace',
-
 		name: 'paySpace',
 		icon: 'file:ps.svg',
 		group: ['input'],
@@ -100,7 +101,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Endpoint Collection',
 				name: 'endpointCollection',
 				type: 'options',
-				options: endpointCollectionsOptions,
+				options: employeeEndpointCollectionsOptions,
 				default: 'basicInformation',
 				displayOptions: {
 					show: {
@@ -114,8 +115,8 @@ export class PaySpace implements INodeType {
 				displayName: 'Endpoint',
 				name: 'endpoint',
 				type: 'options',
-				options: endpointsOptions,
-				default: 'biographical',
+				options: [],
+				default: '',
 				displayOptions: {
 					show: {
 						operation: ['employee'],
@@ -127,7 +128,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Api',
 				name: 'api',
 				type: 'options',
-				options: getApiOptions(`$parameter[endpoint]`),
+				options: [],
 				default: '',
 				displayOptions: {
 					show: {
@@ -137,7 +138,6 @@ export class PaySpace implements INodeType {
 				placeholder: 'yourTokenType',
 				description: 'Api related to operation',
 			},
-
 			{
 				displayName: 'Token Type',
 				name: 'tokenType',
@@ -166,34 +166,24 @@ export class PaySpace implements INodeType {
 				description: 'The Authorization bearer token',
 			},
 			{
-				displayName: dynamicDisplayName(`$parameter["api"]`),
+				displayName: 'Parameter',
 				name: 'dynamicParameter',
 				type: 'string',
 				default: 'this.api.parameter',
 				displayOptions: {
 					show: {
 						operation: ['employee'],
-						api: [
-							'getACollectionOfEmployeesAsOfAnEffectiveDate',
-							'uploadEmployeePhoto',
-							'downloadEmployeePhoto',
-							'createASingleEmployeeRecord',
-							'getASingleEmployeeRecord',
-							'employmentStatusReinstateSameRecord',
-							'employmentStatusReinstateWithNewTaxRecord',
-							'deleteASingleEmploymentStatusRecord',
-							'employmentStatusEmployeeTermination',
-						],
+						api: dynamicDisplayNameApiDisplayArray, //this is moved to the options file
 					},
 				},
-				placeholder: '""',
+				placeholder: '',
 			},
 			{
 				displayName: 'Data (JSON)',
 				name: 'bodyData',
 				type: 'json',
 				default: '',
-				placeholder: getBodyDataPlaceholder(`$parameter["api"]`),
+				placeholder: 'Placeholder for body data is not available',
 				description: 'Body data that needs to be passed in the URL as body JSON',
 				displayOptions: {
 					// the resources and operations to display this element with
@@ -206,7 +196,6 @@ export class PaySpace implements INodeType {
 					},
 				},
 			},
-
 			{
 				displayName: 'Additional Optional Params',
 				name: 'additionalFields',
@@ -228,6 +217,57 @@ export class PaySpace implements INodeType {
 		],
 	};
 
+	async updateProperties(
+    this: IExecuteFunctions,
+    description: INodeTypeDescription,
+): Promise<INodeProperties[]> {
+    const operation = this.getNodeParameter('operation', 0) as string;
+
+    // Get the properties array from the description
+    const properties = description.properties as INodeProperties[];
+
+    // Update display options for each property based on the operation
+    for (const property of properties) {
+        if (property.displayOptions?.show) {
+            property.displayOptions.show.operation = [operation];
+        }
+    }
+
+    // If the operation is 'employee', update specific properties
+    if (operation === 'employee') {
+        const endpointCollection = this.getNodeParameter('endpointCollection', 0) as string;
+        const endpoint = this.getNodeParameter('endpoint', 0) as string;
+        const api = this.getNodeParameter('api', 0) as string;
+
+        // Update the options for the 'Endpoint' property
+        const endpointProperty = properties.find(property => property.name === 'endpoint');
+        if (endpointProperty) {
+            endpointProperty.options = getEndpointOptions(endpointCollection) as INodePropertyOptions[];
+        }
+
+        // Update the options for the 'Api' property
+        const apiProperty = properties.find(property => property.name === 'api');
+        if (apiProperty) {
+            apiProperty.options = getApiOptions(endpoint) as INodePropertyOptions[];
+        }
+
+        // Update the options for the 'Dynamic Parameter' property
+        const dynamicParameterProperty = properties.find(property => property.name === 'dynamicParameter');
+        if (dynamicParameterProperty) {
+            dynamicParameterProperty.displayName = dynamicDisplayName(api) as string;
+        }
+
+// Update the options for the 'Body Data' property
+        const bodyDataProperty = properties.find(property => property.name === 'bodyData');
+				if (bodyDataProperty) {
+            bodyDataProperty.placeholder = getBodyDataPlaceholder(api) as string;
+        }
+    }
+
+    return properties;
+}
+
+
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
@@ -247,7 +287,14 @@ export class PaySpace implements INodeType {
 						? 'https://staging-identity.yourhcm.com/connect/token'
 						: 'https://identity.yourhcm.com/connect/token';
 
-				let config: AxiosRequestConfig = {};
+				let config: AxiosRequestConfig = {
+					method: 'post',
+					maxBodyLength: Infinity,
+					url: apiUrl,
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				};
 				let companyId;
 				let paySpaceAccessToken;
 				let tokenType;
@@ -271,7 +318,6 @@ export class PaySpace implements INodeType {
 						client_secret: client_secret,
 						scope: scope,
 					});
-
 					config = {
 						method: 'post',
 						maxBodyLength: Infinity,
@@ -290,24 +336,12 @@ export class PaySpace implements INodeType {
 
 					config = {
 						method: 'get',
-						maxBodyLength: Infinity,
 						url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
 						headers: {
 							Authorization: tokenType + ' ' + paySpaceAccessToken,
 						},
 					};
 				} else if (operation === 'employee') {
-					// const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
-					// const endpoint = this.getNodeParameter('endpoint', i) as string;
-					// const api = this.getNodeParameter('api', i) as string;
-					// const additionalFields = this.getNodeParameter('additionalFields', i) as any;
-					// companyId = this.getNodeParameter('companyId', i) as number;
-					// paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-					// tokenType = this.getNodeParameter('tokenType', i) as string;
-					// let baseURL: string;
-
-					const endpointCollection = this.getNodeParameter('endpointCollection', i) as string;
-					const endpoint = this.getNodeParameter('endpoint', i) as string;
 					const api = this.getNodeParameter('api', i) as string;
 					const additionalFields = this.getNodeParameter('additionalFields', i) as any;
 					companyId = this.getNodeParameter('companyId', i) as number;
@@ -515,7 +549,8 @@ export class PaySpace implements INodeType {
 							};
 							break;
 						default:
-							// Handle default case or raise an error if necessary
+							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
+							throw new Error('Invalid Operation');
 							break;
 					}
 				} else if (operation === 'company') {

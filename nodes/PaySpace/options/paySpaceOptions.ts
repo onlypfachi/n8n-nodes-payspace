@@ -1,131 +1,8 @@
 import { INodeProperties } from 'n8n-workflow';
 
-export const endpointsOptions = [
-	{
-		name: 'Assets',
-		value: 'assets',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Attachments',
-		value: 'attachments',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Banking Details',
-		value: 'bankingDetails',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Biographical',
-		value: 'biographical',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Dependants',
-		value: 'dependants',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Employee Custom Forms',
-		value: 'employeeCustomForms',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Employee Inbox',
-		value: 'employeeInbox',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'EmployeeAddress',
-		value: 'employeeAddress',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Incident Management',
-		value: 'incidentManagement',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Positions',
-		value: 'positions',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Project Details',
-		value: 'projectDetails',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-	{
-		name: 'Tax Profile',
-		value: 'taxProfile',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-				endpointCollection: ['basicInformation'],
-			},
-		},
-	},
-];
-
 export const operationsOptions = [
 	{
-		name: 'Get Token',
+		name: 'Authentication',
 		value: 'getToken',
 	},
 	{
@@ -136,92 +13,23 @@ export const operationsOptions = [
 		name: 'Employee',
 		value: 'employee',
 	},
-];
-
-export const endpointCollectionsOptions = [
 	{
-		name: 'Basic Information',
-		value: 'basicInformation',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
+		name: 'Company',
+		value: 'company',
 	},
 	{
-		name: 'Costing',
-		value: 'costing',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
+		name: 'Lookup Values',
+		value: 'lookupValues',
 	},
 	{
-		name: 'Leave',
-		value: 'leave',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
+		name: 'File Upload',
+		value: 'fileUpload',
 	},
 	{
-		name: 'Other',
-		value: 'other',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
-	},
-	{
-		name: 'Payroll Processing',
-		value: 'payrollProcessing',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
-	},
-	{
-		name: 'Payroll Results',
-		value: 'payrollResults',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
-	},
-	{
-		name: 'Performance Management',
-		value: 'performanceManagement',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
-	},
-	{
-		name: 'Skills',
-		value: 'skills',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
-	},
-	{
-		name: 'Suspension',
-		value: 'suspension',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
+		name: 'Webhooks',
+		value: 'webhooks',
 	},
 ];
-
 
 export const scopeOptions = [
 	{
@@ -288,4 +96,16 @@ export const paramsOptions: INodeProperties[] = [
 			'Filter by field eg. "EmployeeNumber eq Emp01". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris',
 		default: '',
 	},
+];
+
+export const dynamicDisplayNameApiDisplayArray= [
+	'getACollectionOfEmployeesAsOfAnEffectiveDate',
+	'uploadEmployeePhoto',
+	'downloadEmployeePhoto',
+	'createASingleEmployeeRecord',
+	'getASingleEmployeeRecord',
+	'employmentStatusReinstateSameRecord',
+	'employmentStatusReinstateWithNewTaxRecord',
+	'deleteASingleEmploymentStatusRecord',
+	'employmentStatusEmployeeTermination',
 ];
