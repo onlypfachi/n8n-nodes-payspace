@@ -4,27 +4,17 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	INodeProperties,
-	INodePropertyOptions,
+	// INodePropertyOptions,
 } from 'n8n-workflow';
-import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
-import qs from 'qs';
 import {
-	dynamicDisplayNameApiDisplayArray,
 	operationsOptions,
-	paramsOptions,
-	// paramsOptions,
 	scopeOptions,
 } from './options/paySpaceOptions';
 import { employeeEndpointCollectionsOptions } from './options/employeeOptions';
-import {
-	appendUrl,
-	dynamicDisplayName,
-	getApiOptions,
-	getBodyDataPlaceholder,
-	// notEmpty,
-	getEndpointOptions,
-} from './paySpace.utils';
+import { PaySpaceUtils } from './paySpace.utils';
+import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
+import qs from 'qs';
+
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PaySpace',
@@ -115,7 +105,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Endpoint',
 				name: 'endpoint',
 				type: 'options',
-				options: [],
+				options: PaySpaceUtils.getEndpointOption('{{ $parameter["endpointCollection"] }}'),
 				default: '',
 				displayOptions: {
 					show: {
@@ -128,7 +118,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Api',
 				name: 'api',
 				type: 'options',
-				options: [],
+				options: PaySpaceUtils.getApiOptions('{{ $parameter["endpoint"] }}'),
 				default: '',
 				displayOptions: {
 					show: {
@@ -152,28 +142,13 @@ export class PaySpace implements INodeType {
 				description: 'The Authorization bearer token type',
 			},
 			{
-				displayName: 'PaySpace Access Token',
-				name: 'paySpaceAccessToken',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: {
-						operation: ['getMetadata', 'employee'],
-						api: ['getACollectionOfEmployees'],
-					},
-				},
-				placeholder: 'y0urP4y5p4c34cc355T0k3nFr0mG3tT0k3nN0d3...',
-				description: 'The Authorization bearer token',
-			},
-			{
-				displayName: 'Parameter',
+				displayName: PaySpaceUtils.dynamicDisplayName('{{ $parameter["api"] }}'),
 				name: 'dynamicParameter',
 				type: 'string',
 				default: 'this.api.parameter',
 				displayOptions: {
 					show: {
 						operation: ['employee'],
-						api: dynamicDisplayNameApiDisplayArray, //this is moved to the options file
 					},
 				},
 				placeholder: '',
@@ -183,7 +158,7 @@ export class PaySpace implements INodeType {
 				name: 'bodyData',
 				type: 'json',
 				default: '',
-				placeholder: 'Placeholder for body data is not available',
+				placeholder: PaySpaceUtils.getBodyDataPlaceholder('{{ $parameter["api"] }}'),
 				description: 'Body data that needs to be passed in the URL as body JSON',
 				displayOptions: {
 					// the resources and operations to display this element with
@@ -210,63 +185,64 @@ export class PaySpace implements INodeType {
 					{
 						name: 'params',
 						displayName: 'Parameters',
-						values: paramsOptions,
+						values: [],
 					},
 				],
 			},
 		],
 	};
 
-	async updateProperties(
-    this: IExecuteFunctions,
-    description: INodeTypeDescription,
-): Promise<INodeProperties[]> {
-    const operation = this.getNodeParameter('operation', 0) as string;
 
-    // Get the properties array from the description
-    const properties = description.properties as INodeProperties[];
 
-    // Update display options for each property based on the operation
-    for (const property of properties) {
-        if (property.displayOptions?.show) {
-            property.displayOptions.show.operation = [operation];
-        }
-    }
+	// 	async updateProperties(
+	//     this: IExecuteFunctions,
+	//     description: INodeTypeDescription,
+	// ): Promise<INodeProperties[]> {
+	//     const operation = this.getNodeParameter('operation', 0) as string;
 
-    // If the operation is 'employee', update specific properties
-    if (operation === 'employee') {
-        const endpointCollection = this.getNodeParameter('endpointCollection', 0) as string;
-        const endpoint = this.getNodeParameter('endpoint', 0) as string;
-        const api = this.getNodeParameter('api', 0) as string;
+	//     // Get the properties array from the description
+	//     const properties = description.properties as INodeProperties[];
 
-        // Update the options for the 'Endpoint' property
-        const endpointProperty = properties.find(property => property.name === 'endpoint');
-        if (endpointProperty) {
-            endpointProperty.options = getEndpointOptions(endpointCollection) as INodePropertyOptions[];
-        }
+	//     // Update display options for each property based on the operation
+	//     for (const property of properties) {
+	//         if (property.displayOptions?.show) {
+	//             property.displayOptions.show.operation = [operation];
+	//         }
+	//     }
 
-        // Update the options for the 'Api' property
-        const apiProperty = properties.find(property => property.name === 'api');
-        if (apiProperty) {
-            apiProperty.options = getApiOptions(endpoint) as INodePropertyOptions[];
-        }
+	//     // If the operation is 'employee', update specific properties
+	//     if (operation === 'employee') {
+	//         const endpointCollection = this.getNodeParameter('endpointCollection', 0) as string;
+	//         const endpoint = this.getNodeParameter('endpoint', 0) as string;
+	//         const api = this.getNodeParameter('api', 0) as string;
 
-        // Update the options for the 'Dynamic Parameter' property
-        const dynamicParameterProperty = properties.find(property => property.name === 'dynamicParameter');
-        if (dynamicParameterProperty) {
-            dynamicParameterProperty.displayName = dynamicDisplayName(api) as string;
-        }
+	//         // Update the options for the 'Endpoint' property
+	//         const endpointProperty = properties.find(property => property.name === 'endpoint');
+	//         if (endpointProperty) {
+	//             endpointProperty.options = getEndpointOptions(endpointCollection) as INodePropertyOptions[];
+	//         }
 
-// Update the options for the 'Body Data' property
-        const bodyDataProperty = properties.find(property => property.name === 'bodyData');
-				if (bodyDataProperty) {
-            bodyDataProperty.placeholder = getBodyDataPlaceholder(api) as string;
-        }
-    }
+	//         // Update the options for the 'Api' property
+	//         const apiProperty = properties.find(property => property.name === 'api');
+	//         if (apiProperty) {
+	//             apiProperty.options = getApiOptions(endpoint) as INodePropertyOptions[];
+	//         }
 
-    return properties;
-}
+	//         // Update the options for the 'Dynamic Parameter' property
+	//         const dynamicParameterProperty = properties.find(property => property.name === 'dynamicParameter');
+	//         if (dynamicParameterProperty) {
+	//             dynamicParameterProperty.displayName = dynamicDisplayName(api) as string;
+	//         }
 
+	// // Update the options for the 'Body Data' property
+	//         const bodyDataProperty = properties.find(property => property.name === 'bodyData');
+	// 				if (bodyDataProperty) {
+	//             bodyDataProperty.placeholder = getBodyDataPlaceholder(api) as string;
+	//         }
+	//     }
+
+	//     return properties;
+	// }
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
@@ -421,7 +397,7 @@ export class PaySpace implements INodeType {
 						case 'getAnEmployeeAddress':
 							const EmployeeNumber = this.getNodeParameter('dynamicParameter', i) as string;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
-							config.url = appendUrl(baseURL, additionalFields.params);
+							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
 							config.headers = {
 								Authorization: `Bearer ${paySpaceAccessToken}`,
 								'content-type': 'application/json',
@@ -431,7 +407,7 @@ export class PaySpace implements INodeType {
 							const AddressId = this.getNodeParameter('dynamicParameter', i) as string;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${AddressId})`;
 							const dataAddressUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = appendUrl(baseURL, additionalFields.params);
+							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
 							config.method = 'patch';
 							config.data = dataAddressUpdate; //see "EmployeeAddress" in metadata endpoint for available fields
 							config.headers = {
@@ -440,7 +416,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfEmploymentStatus':
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
-							config.url = appendUrl(baseURL, additionalFields.params);
+							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
 							config.method = 'get';
 							config.headers = {
 								Authorization: `Bearer ${paySpaceAccessToken}`,
@@ -458,7 +434,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate':
 							const EffectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
-							config.url = appendUrl(
+							config.url = PaySpaceUtils.appendUrl(
 								`${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${EffectiveDate}`,
 								additionalFields.params,
 							); //
@@ -470,7 +446,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfAllEmploymentStatuses':
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/all?`;
-							config.url = appendUrl(baseURL, additionalFields.params); //
+							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params); //
 							config.method = 'get';
 							config.headers = {
 								Authorization: `Bearer ${paySpaceAccessToken}`,

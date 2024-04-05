@@ -1,3 +1,5 @@
+import { INodePropertyOptions } from "n8n-workflow";
+
 export const employeeEndpointCollectionsOptions = [
 	{
 		name: 'Basic Information',
@@ -82,7 +84,7 @@ export const employeeEndpointCollectionsOptions = [
 	},
 ];
 
-export const basicInformationEndpointsCollectionOptions = [
+export const basicInformationEndpointsCollectionOptions: INodePropertyOptions[] = [
 	{
 		name: 'Assets',
 		value: 'assets',
@@ -133,7 +135,7 @@ export const basicInformationEndpointsCollectionOptions = [
 	},
 ];
 
-export const biographicalApiOptions = [
+export const biographicalApiOptions: INodePropertyOptions[] = [
 	{
 		name: 'Create a Single Employee Record',
 		value: 'createASingleEmployeeRecord',
