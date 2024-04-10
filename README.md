@@ -4,15 +4,15 @@
 
 ## n8n PaySpace Node
 
-This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can also push data into PaySpace from third party systems.
+This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can READ, CREATE , UPDATE or DELETE  PaySpace data in n8n system.
 
 Installation
-Clone this repository into your n8n nodes directory.
+Install te node in your n8n server.
 Restart your n8n server.
 Usage
 This node supports various PaySpace API functionalities. You can configure the node to:
 
-- Authentication
+- Get Token
 - Get MetaData.
 
 Note: You will need to obtain a PaySpace Authentication key and configure it in the node properties for other uses besides getting token.
