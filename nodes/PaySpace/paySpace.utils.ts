@@ -1,4 +1,4 @@
-import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
+	import { IDataObject, INodePropertyOptions, ILoadOptionsFunctions, getNodeParameter} from 'n8n-workflow';
 import {
 	biographicalApiOptions,
 	employeeAddressApiOptions,
@@ -68,9 +68,9 @@ export const dynamicDisplayName = (api: string) => {
 	}
 };
 
-export const getApiOptions = (endpoint: string):	INodePropertyOptions[] => {
+export async function getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	let options: any;
-
+const endpoint = this.getCurrentNodeParameter('endpoint') as string;
 	switch (endpoint) {
 		case 'biographical':
 			options = biographicalApiOptions;

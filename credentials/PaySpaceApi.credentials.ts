@@ -10,8 +10,8 @@ export class PaySpaceApi implements ICredentialType {
 			type: 'options',
 			options: [
 				{
-					name: 'Testing',
-					value: 'testing',
+					name: 'Staging',
+					value: 'staging',
 				},
 				{
 					name: 'Production',

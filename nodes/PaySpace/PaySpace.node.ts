@@ -11,7 +11,7 @@ import {
 	scopeOptions,
 } from './options/paySpaceOptions';
 import { employeeEndpointCollectionsOptions } from './options/employeeOptions';
-import { PaySpaceUtils } from './paySpace.utils';
+import * as PaySpaceUtils from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
@@ -105,7 +105,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Endpoint',
 				name: 'endpoint',
 				type: 'options',
-				options: PaySpaceUtils.getEndpointOption('{{ $parameter["endpointCollection"] }}'),
+				options: PaySpaceUtils.getEndpointOptions('{{ $parameter["endpointCollection"] }}'),
 				default: '',
 				displayOptions: {
 					show: {
@@ -118,7 +118,7 @@ export class PaySpace implements INodeType {
 				displayName: 'Api',
 				name: 'api',
 				type: 'options',
-				options: PaySpaceUtils.getApiOptions('{{ $parameter["endpoint"] }}'),
+				options: PaySpaceUtils.getApiOptions(),
 				default: '',
 				displayOptions: {
 					show: {
@@ -189,60 +189,40 @@ export class PaySpace implements INodeType {
 					},
 				],
 			},
+			{
+				displayName: 'Columns',
+				name: 'columns', // The name used to reference the element UI within the code
+				type: 'resourceMapper', // The UI element type
+				default: {
+					// mappingMode can be defined in the component (mappingMode: 'defineBelow')
+					// or you can attempt automatic mapping (mappingMode: 'autoMapInputData')
+					mappingMode: 'defineBelow',
+					// Important: always set default value to null
+					value: null,
+				},
+				required: true,
+				// See "Resource mapper type options interface" below for the full typeOptions specification
+				typeOptions: {
+					resourceMapper: {
+						resourceMapperMethod: 'getMappingColumns',
+						mode: 'update',
+						fieldWords: {
+							singular: 'column',
+							plural: 'columns',
+						},
+						addAllFields: true,
+						multiKeyMatch: true,
+						supportAutoMap: true,
+						matchingFieldsLabels: {
+							title: 'Custom matching columns title',
+							description: 'Help text for custom matching columns',
+							hint: 'Below-field hint for custom matching columns',
+						},
+					},
+				},
+			},
 		],
 	};
-
-
-
-	// 	async updateProperties(
-	//     this: IExecuteFunctions,
-	//     description: INodeTypeDescription,
-	// ): Promise<INodeProperties[]> {
-	//     const operation = this.getNodeParameter('operation', 0) as string;
-
-	//     // Get the properties array from the description
-	//     const properties = description.properties as INodeProperties[];
-
-	//     // Update display options for each property based on the operation
-	//     for (const property of properties) {
-	//         if (property.displayOptions?.show) {
-	//             property.displayOptions.show.operation = [operation];
-	//         }
-	//     }
-
-	//     // If the operation is 'employee', update specific properties
-	//     if (operation === 'employee') {
-	//         const endpointCollection = this.getNodeParameter('endpointCollection', 0) as string;
-	//         const endpoint = this.getNodeParameter('endpoint', 0) as string;
-	//         const api = this.getNodeParameter('api', 0) as string;
-
-	//         // Update the options for the 'Endpoint' property
-	//         const endpointProperty = properties.find(property => property.name === 'endpoint');
-	//         if (endpointProperty) {
-	//             endpointProperty.options = getEndpointOptions(endpointCollection) as INodePropertyOptions[];
-	//         }
-
-	//         // Update the options for the 'Api' property
-	//         const apiProperty = properties.find(property => property.name === 'api');
-	//         if (apiProperty) {
-	//             apiProperty.options = getApiOptions(endpoint) as INodePropertyOptions[];
-	//         }
-
-	//         // Update the options for the 'Dynamic Parameter' property
-	//         const dynamicParameterProperty = properties.find(property => property.name === 'dynamicParameter');
-	//         if (dynamicParameterProperty) {
-	//             dynamicParameterProperty.displayName = dynamicDisplayName(api) as string;
-	//         }
-
-	// // Update the options for the 'Body Data' property
-	//         const bodyDataProperty = properties.find(property => property.name === 'bodyData');
-	// 				if (bodyDataProperty) {
-	//             bodyDataProperty.placeholder = getBodyDataPlaceholder(api) as string;
-	//         }
-	//     }
-
-	//     return properties;
-	// }
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
