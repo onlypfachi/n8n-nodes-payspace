@@ -1,4 +1,4 @@
-	import { IDataObject, INodeProperties} from 'n8n-workflow';
+import { IDataObject } from 'n8n-workflow';
 
 /**
  * Appends query parameters to a base URL.
@@ -36,33 +36,6 @@ export const notEmpty = (obj: IDataObject) => {
 	return false; // Object is empty
 };
 
-export const dynamicDisplayName = (api: string): string => {
-	if (api === 'getASingleEmployeeRecord') {
-		return 'Employee ID';
-	} else if (
-		api === 'getACollectionOfEmployeesAsOfAnEffectiveDate' ||
-		api === 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate'
-	) {
-		return 'Effective Date';
-	} else if (api === 'getAnEmployeeAddress') {
-		return 'Employee Number';
-	} else if (api === 'updateASingleEmployeeAddressRecord') {
-		return 'Address ID';
-	} else if (api === 'getASingleEmploymentStatusRecord') {
-		return 'Status ID';
-	} else if (
-		api === 'updateASingleEmploymentStatusRecord' ||
-		api === 'employmentStatusEmployeeTermination' ||
-		api === 'employmentStatusReinstateWithNewTaxRecord' ||
-		api === 'employmentStatusReinstateSameRecord'
-	) {
-		return 'Employment Status Id';
-	} else {
-		return 'Employment Status';
-	}
-};
-
-
 export const getBodyDataPlaceholder = (api: string): string => {
 	let bodyDataPlaceholder: string = '';
 
@@ -90,17 +63,3 @@ export const getBodyDataPlaceholder = (api: string): string => {
 
 	return bodyDataPlaceholder;
 };
-
-// export const loadEndpointOptions: ILoadOptionsFunctions['getOptions'] = async ({ node }) => {
-// 	const endpointCollection = node?.parameter('endpointCollection') as string;
-
-// 	// Now you can use endpointCollection to determine which options to load
-// 	switch (endpointCollection) {
-// 			case 'basicInformation':
-// 					return basicInformationEndpointsCollectionOptions;
-// 			case 'payrollProcessing':
-// 					return payrollProcessingEndpointsCollectionOptions;
-// 			default:
-// 					return [];
-// 	}
-// };;

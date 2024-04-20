@@ -7,7 +7,7 @@ import type {
 	ILoadOptionsFunctions,
 	INodePropertyOptions,
 } from 'n8n-workflow';
-import { operationsOptions, scopeOptions } from './options/paySpaceOptions';
+import { operationsOptions, paramsOptions, scopeOptions } from './options/main.options';
 import {
 	employeeEndpointCollectionsOptions,
 	basicInformationEndpointsCollectionOptions,
@@ -15,10 +15,11 @@ import {
 	biographicalApiOptions,
 	employeeAddressApiOptions,
 	taxProfilesApiOptions,
-} from './options/employeeOptions';
+} from './options/employee.options';
 import * as PaySpaceUtils from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
+import { companyEndpointCollectionsOptions } from './options/company.options';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -65,7 +66,7 @@ export class PaySpace implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: operationsOptions,
-				default: 'getToken',
+				default: 'authentication',
 				description: 'Which operation to use?',
 			},
 			{
@@ -87,24 +88,27 @@ export class PaySpace implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
-						operation: ['getMetadata', 'employee'],
+						operation: ['getMetadata', 'employee', 'company'],
 					},
 				},
 				placeholder: '123456789',
 			},
 			{
-				displayName: 'Endpoint Collection',
+				displayName: 'Endpoint Collection Name or ID',
 				name: 'endpointCollection',
 				type: 'options',
-				options: employeeEndpointCollectionsOptions,
-				default: 'basicInformation',
+				default: '',
 				displayOptions: {
 					show: {
-						operation: ['employee'],
+						operation: ['employee', 'company'],
 					},
 				},
-				placeholder: '123456789',
-				description: 'Collection of endpoints related to operation',
+				typeOptions: {
+					loadOptionsMethod: 'loadEndpointCollectionOptions', // This method must be defined in loadOptions
+					loadOptionsDependsOn: ['operation'], // Depends on
+				},
+				description:
+					'Collection of endpoints related to operation. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 			},
 			{
 				displayName: 'Endpoint Name or ID',
@@ -118,11 +122,10 @@ export class PaySpace implements INodeType {
 				},
 				typeOptions: {
 					loadOptionsMethod: 'loadEndpointOptions', // This method must be defined in loadOptions
-					loadOptionsDependsOn: ['endpointCollection'], // Depends on the country field
+					loadOptionsDependsOn: ['endpointCollection'], // Depends on
 				},
 				description:
 					'Endpoints related to operation. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-				required: true,
 			},
 			{
 				displayName: 'Api Name or ID',
@@ -130,7 +133,7 @@ export class PaySpace implements INodeType {
 				type: 'options',
 				typeOptions: {
 					loadOptionsMethod: 'getApiOptions', // This method must be defined in loadOptions
-					loadOptionsDependsOn: ['endpoint'], // Depends on the country field
+					loadOptionsDependsOn: ['endpoint'], // Depends on
 				},
 				default: '',
 				displayOptions: {
@@ -138,7 +141,6 @@ export class PaySpace implements INodeType {
 						operation: ['employee'],
 					},
 				},
-				placeholder: 'yourTokenType',
 				description:
 					'Api related to operation. Choose from the list <a href="https://developer.payspace.com/">list</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 			},
@@ -146,36 +148,91 @@ export class PaySpace implements INodeType {
 				displayName: 'Token Type',
 				name: 'tokenType',
 				type: 'string',
-				default: 'Bearer',
+				default: 'Bearer: ',
 				displayOptions: {
 					show: {
 						operation: ['getMetadata', 'employee'],
 					},
 				},
-				placeholder: 'yourTokenType',
 				description: 'The Authorization bearer token type',
 			},
 			{
-				displayName: PaySpaceUtils.dynamicDisplayName('{{ $parameter["api"] }}'),
-				name: 'dynamicParameter',
+				displayName: 'Status ID',
+				name: 'StatusId',
 				type: 'string',
-				default: 'this.api.parameter',
+				default: '',
+				description: 'Enter the status ID associated',
 				displayOptions: {
 					show: {
-						operation: ['employee'],
+						api: [
+							'getASingleEmploymentStatusRecord',
+							'updateASingleEmploymentStatusRecord',
+							'employmentStatusEmployeeTermination',
+							'employmentStatusReinstateWithNewTaxRecord',
+							'employmentStatusReinstateSameRecord',
+						],
 					},
 				},
-				placeholder: '',
+			},
+			{
+				displayName: 'Effective Date',
+				name: 'effectiveDate',
+				type: 'dateTime',
+				default: '',
+				description: 'Enter effective date',
+				displayOptions: {
+					show: {
+						api: [
+							'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
+							'getACollectionOfEmployeesAsOfAnEffectiveDate',
+						],
+					},
+				},
+			},
+			{
+				displayName: 'Employee ID',
+				name: 'employeeId',
+				type: 'string',
+				default: '',
+				description: 'Enter the employee ID associated',
+				displayOptions: {
+					show: {
+						api: ['getASingleEmployeeRecord'],
+					},
+				},
+			},
+			{
+				displayName: 'Employee Number',
+				name: 'employeeNumber',
+				type: 'string',
+				default: '',
+				description: 'Enter the employee number associated',
+				displayOptions: {
+					show: {
+						api: ['getAnEmployeeAddress'],
+					},
+				},
+			},
+			{
+				displayName: 'Address ID',
+				name: 'addressId',
+				type: 'string',
+				default: '',
+				description: 'Enter the address ID associated',
+				displayOptions: {
+					show: {
+						api: ['updateASingleEmployeeAddressRecord'],
+					},
+				},
 			},
 			{
 				displayName: 'Data (JSON)',
 				name: 'bodyData',
 				type: 'json',
-				default: '',
+				default: { key: 'value' },
 				placeholder: PaySpaceUtils.getBodyDataPlaceholder('{{ $parameter["api"] }}'),
 				description: 'Body data that needs to be passed in the URL as body JSON',
 				displayOptions: {
-					// the resources and operations to display this element with
 					show: {
 						api: [
 							'updateASingleEmployeeAddressRecord',
@@ -188,7 +245,7 @@ export class PaySpace implements INodeType {
 			{
 				displayName: 'Additional Optional Params',
 				name: 'additionalFields',
-				placeholder: 'Add optional params',
+				placeholder: 'Additional optional params',
 				type: 'fixedCollection',
 				default: {},
 				typeOptions: {
@@ -199,15 +256,48 @@ export class PaySpace implements INodeType {
 					{
 						name: 'params',
 						displayName: 'Parameters',
-						values: [],
+						values: paramsOptions,
 					},
 				],
+				displayOptions: {
+					show: {
+						api: [
+							'getASingleEmploymentStatusRecord',
+							'getASingleEmployeeRecord',
+							'getAnEmployeeAddress',
+							'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
+							'getACollectionOfEmployeesAsOfAnEffectiveDate',
+							'updateASingleEmploymentStatusRecord',
+						],
+					},
+				},
+			},
+			{
+				displayName: 'This node is still in development',
+				name: 'notice',
+				type: 'notice',
+				default: '',
 			},
 		],
 	};
 
 	methods = {
 		loadOptions: {
+			async loadEndpointCollectionOptions(
+				this: ILoadOptionsFunctions,
+			): Promise<INodePropertyOptions[]> {
+				const operation = this.getCurrentNodeParameter('operation') as string;
+
+				switch (operation) {
+					case 'employee':
+						return employeeEndpointCollectionsOptions;
+					case 'company':
+						return companyEndpointCollectionsOptions;
+					default:
+						return [];
+				}
+			},
+
 			async loadEndpointOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const endpointCollection = this.getCurrentNodeParameter('endpointCollection') as string;
 				switch (endpointCollection) {
@@ -221,12 +311,18 @@ export class PaySpace implements INodeType {
 			},
 			async getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const endpoint = this.getCurrentNodeParameter('endpoint') as string;
-				const optionsMap: Record<string, INodePropertyOptions[]> = {
-					biographical: biographicalApiOptions,
-					employeeAddress: employeeAddressApiOptions,
-					taxProfiles: taxProfilesApiOptions,
-				};
-				return optionsMap[endpoint] || [];
+
+				switch (endpoint) {
+					case 'biographical':
+						return biographicalApiOptions;
+					case 'employeeAddress':
+						return employeeAddressApiOptions;
+					case 'taxProfiles':
+						return taxProfilesApiOptions;
+					default:
+						// Handle default case (if needed)
+						return [];
+				}
 			},
 		},
 	};

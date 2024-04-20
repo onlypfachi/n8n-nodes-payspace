@@ -1,86 +1,41 @@
-import { INodePropertyOptions } from "n8n-workflow";
+import { INodePropertyOptions } from 'n8n-workflow';
 
-export const employeeEndpointCollectionsOptions = [
+export const employeeEndpointCollectionsOptions: INodePropertyOptions[] = [
 	{
 		name: 'Basic Information',
 		value: 'basicInformation',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Costing',
 		value: 'costing',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Leave',
 		value: 'leave',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Other',
 		value: 'other',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Payroll Processing',
 		value: 'payrollProcessing',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Payroll Results',
 		value: 'payrollResults',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Performance Management',
 		value: 'performanceManagement',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Skills',
 		value: 'skills',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 	{
 		name: 'Suspension',
 		value: 'suspension',
-		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
-		},
 	},
 ];
 
