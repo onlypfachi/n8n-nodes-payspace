@@ -134,6 +134,7 @@ export const basicInformationEndpointsCollectionOptions: INodePropertyOptions[] 
 		value: 'taxProfile',
 	},
 ];
+export const payrollProcessingEndpointsCollectionOptions: INodePropertyOptions[] = [];
 
 export const biographicalApiOptions: INodePropertyOptions[] = [
 	{

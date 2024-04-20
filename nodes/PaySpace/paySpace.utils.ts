@@ -1,10 +1,4 @@
-	import { IDataObject, INodePropertyOptions, ILoadOptionsFunctions, getNodeParameter} from 'n8n-workflow';
-import {
-	biographicalApiOptions,
-	employeeAddressApiOptions,
-	basicInformationEndpointsCollectionOptions,
-	taxProfilesApiOptions,
-} from './options/employeeOptions';
+	import { IDataObject, INodeProperties} from 'n8n-workflow';
 
 /**
  * Appends query parameters to a base URL.
@@ -42,7 +36,7 @@ export const notEmpty = (obj: IDataObject) => {
 	return false; // Object is empty
 };
 
-export const dynamicDisplayName = (api: string) => {
+export const dynamicDisplayName = (api: string): string => {
 	if (api === 'getASingleEmployeeRecord') {
 		return 'Employee ID';
 	} else if (
@@ -68,26 +62,6 @@ export const dynamicDisplayName = (api: string) => {
 	}
 };
 
-export async function getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	let options: any;
-const endpoint = this.getCurrentNodeParameter('endpoint') as string;
-	switch (endpoint) {
-		case 'biographical':
-			options = biographicalApiOptions;
-			break;
-		case 'employeeAddress':
-			options = employeeAddressApiOptions;
-			break;
-		case 'taxProfiles':
-			options = taxProfilesApiOptions;
-			break;
-		default:
-			options = [];
-			break;
-	}
-
-	return options;
-};
 
 export const getBodyDataPlaceholder = (api: string): string => {
 	let bodyDataPlaceholder: string = '';
@@ -117,13 +91,16 @@ export const getBodyDataPlaceholder = (api: string): string => {
 	return bodyDataPlaceholder;
 };
 
-export const getEndpointOptions = (endpointCollection: string): INodePropertyOptions[] => {
-	switch (endpointCollection) {
-		case 'basicInformation':
-			return basicInformationEndpointsCollectionOptions;
-		case 'payrollProcessing':
-			return basicInformationEndpointsCollectionOptions;
-		default:
-			return [];
-	}
-};
+// export const loadEndpointOptions: ILoadOptionsFunctions['getOptions'] = async ({ node }) => {
+// 	const endpointCollection = node?.parameter('endpointCollection') as string;
+
+// 	// Now you can use endpointCollection to determine which options to load
+// 	switch (endpointCollection) {
+// 			case 'basicInformation':
+// 					return basicInformationEndpointsCollectionOptions;
+// 			case 'payrollProcessing':
+// 					return payrollProcessingEndpointsCollectionOptions;
+// 			default:
+// 					return [];
+// 	}
+// };;

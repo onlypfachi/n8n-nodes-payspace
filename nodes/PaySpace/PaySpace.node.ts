@@ -4,13 +4,18 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	// INodePropertyOptions,
+	ILoadOptionsFunctions,
+	INodePropertyOptions,
 } from 'n8n-workflow';
+import { operationsOptions, scopeOptions } from './options/paySpaceOptions';
 import {
-	operationsOptions,
-	scopeOptions,
-} from './options/paySpaceOptions';
-import { employeeEndpointCollectionsOptions } from './options/employeeOptions';
+	employeeEndpointCollectionsOptions,
+	basicInformationEndpointsCollectionOptions,
+	payrollProcessingEndpointsCollectionOptions,
+	biographicalApiOptions,
+	employeeAddressApiOptions,
+	taxProfilesApiOptions,
+} from './options/employeeOptions';
 import * as PaySpaceUtils from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
@@ -102,23 +107,31 @@ export class PaySpace implements INodeType {
 				description: 'Collection of endpoints related to operation',
 			},
 			{
-				displayName: 'Endpoint',
+				displayName: 'Endpoint Name or ID',
 				name: 'endpoint',
 				type: 'options',
-				options: PaySpaceUtils.getEndpointOptions('{{ $parameter["endpointCollection"] }}'),
 				default: '',
 				displayOptions: {
 					show: {
 						operation: ['employee'],
 					},
 				},
-				description: 'Endpoints related to operation',
+				typeOptions: {
+					loadOptionsMethod: 'loadEndpointOptions', // This method must be defined in loadOptions
+					loadOptionsDependsOn: ['endpointCollection'], // Depends on the country field
+				},
+				description:
+					'Endpoints related to operation. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				required: true,
 			},
 			{
-				displayName: 'Api',
+				displayName: 'Api Name or ID',
 				name: 'api',
 				type: 'options',
-				options: PaySpaceUtils.getApiOptions(),
+				typeOptions: {
+					loadOptionsMethod: 'getApiOptions', // This method must be defined in loadOptions
+					loadOptionsDependsOn: ['endpoint'], // Depends on the country field
+				},
 				default: '',
 				displayOptions: {
 					show: {
@@ -126,7 +139,8 @@ export class PaySpace implements INodeType {
 					},
 				},
 				placeholder: 'yourTokenType',
-				description: 'Api related to operation',
+				description:
+					'Api related to operation. Choose from the list <a href="https://developer.payspace.com/">list</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 			},
 			{
 				displayName: 'Token Type',
@@ -189,39 +203,32 @@ export class PaySpace implements INodeType {
 					},
 				],
 			},
-			{
-				displayName: 'Columns',
-				name: 'columns', // The name used to reference the element UI within the code
-				type: 'resourceMapper', // The UI element type
-				default: {
-					// mappingMode can be defined in the component (mappingMode: 'defineBelow')
-					// or you can attempt automatic mapping (mappingMode: 'autoMapInputData')
-					mappingMode: 'defineBelow',
-					// Important: always set default value to null
-					value: null,
-				},
-				required: true,
-				// See "Resource mapper type options interface" below for the full typeOptions specification
-				typeOptions: {
-					resourceMapper: {
-						resourceMapperMethod: 'getMappingColumns',
-						mode: 'update',
-						fieldWords: {
-							singular: 'column',
-							plural: 'columns',
-						},
-						addAllFields: true,
-						multiKeyMatch: true,
-						supportAutoMap: true,
-						matchingFieldsLabels: {
-							title: 'Custom matching columns title',
-							description: 'Help text for custom matching columns',
-							hint: 'Below-field hint for custom matching columns',
-						},
-					},
-				},
-			},
 		],
+	};
+
+	methods = {
+		loadOptions: {
+			async loadEndpointOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const endpointCollection = this.getCurrentNodeParameter('endpointCollection') as string;
+				switch (endpointCollection) {
+					case 'basicInformation':
+						return basicInformationEndpointsCollectionOptions;
+					case 'payrollProcessing':
+						return payrollProcessingEndpointsCollectionOptions;
+					default:
+						return [];
+				}
+			},
+			async getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const endpoint = this.getCurrentNodeParameter('endpoint') as string;
+				const optionsMap: Record<string, INodePropertyOptions[]> = {
+					biographical: biographicalApiOptions,
+					employeeAddress: employeeAddressApiOptions,
+					taxProfiles: taxProfilesApiOptions,
+				};
+				return optionsMap[endpoint] || [];
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
