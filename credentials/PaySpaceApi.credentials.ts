@@ -2,26 +2,26 @@ import type { ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class PaySpaceApi implements ICredentialType {
 	name = 'clientCredentialApi';
-	displayName = 'Client Credential API';
+	displayName = 'Client Payspace Credential  API';
 	properties: INodeProperties[] = [
-		{
-			displayName: 'Client Environment',
-			name: 'client',
-			type: 'options',
-			options: [
-				{
-					name: 'Staging',
-					value: 'staging',
-				},
-				{
-					name: 'Production',
-					value: 'production',
-				},
-			],
-			default: 'testing',
-			description:
-				'Are these credentials for testing or production environment?',
-		},
+		// {
+		// 	displayName: 'Client Environment',
+		// 	name: 'client',
+		// 	type: 'options',
+		// 	options: [
+		// 		{
+		// 			name: 'Staging',
+		// 			value: 'staging',
+		// 		},
+		// 		{
+		// 			name: 'Production',
+		// 			value: 'production',
+		// 		},
+		// 	],
+		// 	default: 'testing',
+		// 	description:
+		// 		'Are these credentials for testing or production environment?',
+		// },
 		{
 			displayName: 'Client ID',
 			name: 'client_id',
