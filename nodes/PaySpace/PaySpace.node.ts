@@ -121,7 +121,6 @@ export class PaySpace implements INodeType {
 				};
 				let companyId;
 				let paySpaceAccessToken;
-				let tokenType;
 				const getMetadataResponse = {
 					json: {
 						success: true,
@@ -144,7 +143,6 @@ export class PaySpace implements INodeType {
 					});
 					config = {
 						method: 'post',
-						maxBodyLength: Infinity,
 						url: authenticationUrl,
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded',
@@ -156,13 +154,12 @@ export class PaySpace implements INodeType {
 					// Get Meta Data
 					companyId = this.getNodeParameter('companyId', i) as number;
 					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-					tokenType = this.getNodeParameter('tokenType', i) as string;
 
 					config = {
 						method: 'get',
 						url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
 						headers: {
-							Authorization: tokenType + ' ' + paySpaceAccessToken,
+							Authorization: paySpaceAccessToken,
 						},
 					};
 				} else if (operation === 'employee') {
@@ -170,14 +167,13 @@ export class PaySpace implements INodeType {
 					const additionalFields = this.getNodeParameter('additionalFields', i) as any;
 					companyId = this.getNodeParameter('companyId', i) as number;
 					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-					tokenType = this.getNodeParameter('tokenType', i) as string;
 					let baseURL: string;
 
 					switch (api) {
 						case 'getACollectionOfEmployees':
 							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -185,7 +181,7 @@ export class PaySpace implements INodeType {
 							const effectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee/effective/${effectiveDate}?`;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -193,7 +189,7 @@ export class PaySpace implements INodeType {
 							const EmployeeIdSingle = this.getNodeParameter('dynamicParameter', i) as string;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${EmployeeIdSingle})`;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -204,7 +200,7 @@ export class PaySpace implements INodeType {
 							config.method = 'patch';
 							config.data = dataCreate;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -214,7 +210,7 @@ export class PaySpace implements INodeType {
 							config.method = 'patch';
 							config.data = dataUpdate;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -226,11 +222,11 @@ export class PaySpace implements INodeType {
 							config.url = baseURLDownload;
 							config.data = dataDownload;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								...dataDownload.getHeaders(),
 							};
 							break;
-						case 'uploadEmployeePhoto':
+						case 'uploadEmployeePhoto': //TODO: Implement upload logic
 							const FormDataUpload = require('form-data');
 							const EmployeeIdUpload = this.getNodeParameter('dynamicParameter', i) as string;
 							const baseURLUpload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${EmployeeIdUpload}/image/upload`;
@@ -238,7 +234,7 @@ export class PaySpace implements INodeType {
 							config.url = baseURLUpload;
 							config.data = dataUpload;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								...dataUpload.getHeaders(),
 							};
 							break;
@@ -247,7 +243,7 @@ export class PaySpace implements INodeType {
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
 							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -267,7 +263,7 @@ export class PaySpace implements INodeType {
 							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
 							config.method = 'get';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -276,7 +272,7 @@ export class PaySpace implements INodeType {
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${StatusId})`; //
 							config.method = 'get';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -288,7 +284,7 @@ export class PaySpace implements INodeType {
 							); //
 							config.method = 'get';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -297,7 +293,7 @@ export class PaySpace implements INodeType {
 							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params); //
 							config.method = 'get';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
@@ -306,7 +302,7 @@ export class PaySpace implements INodeType {
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus`;
 							config.method = 'post';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							config.data = EmployeeEmploymentStatus; //see "EmployeeEmploymentStatus" in metadata endpoint for available fields
@@ -315,10 +311,10 @@ export class PaySpace implements INodeType {
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							const EmploymentStatusId = this.getNodeParameter('dynamicParameter', i) as string;
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${EmploymentStatusId})`;
-							config.maxBodyLength = Infinity;
+
 							config.method = 'patch';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							//see "EmployeeEmploymentStatus" in metadata endpoint for available fields
@@ -329,20 +325,19 @@ export class PaySpace implements INodeType {
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
 								this.getNodeParameter('dynamicParameter', i) as string
 							})`;
-							config.maxBodyLength = Infinity;
+
 							config.method = 'patch';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
 						case 'employmentStatusReinstateSameRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 
-							config.maxBodyLength = Infinity;
 							config.method = 'patch';
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
@@ -351,24 +346,23 @@ export class PaySpace implements INodeType {
 							break;
 						case 'employmentStatusReinstateWithNewTaxRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.maxBodyLength = Infinity;
+
 							config.method = 'patch';
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
 								this.getNodeParameter('dynamicParameter', i) as string
 							})`;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;
 						case 'deleteASingleEmploymentStatusRecord':
-							config.maxBodyLength = Infinity;
 							config.method = 'delete';
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
 								this.getNodeParameter('dynamicParameter', i) as string
 							})`;
 							config.headers = {
-								Authorization: `Bearer ${paySpaceAccessToken}`,
+								Authorization: paySpaceAccessToken,
 								'content-type': 'application/json',
 							};
 							break;

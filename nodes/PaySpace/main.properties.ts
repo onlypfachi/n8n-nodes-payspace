@@ -101,7 +101,7 @@ export const properties: INodeProperties[] = [
 	},
 	{
 		displayName: 'Token',
-		name: 'token',
+		name: 'paySpaceAccessToken',
 		type: 'string',
 		default: 'Bearer: <your token here>',
 		displayOptions: {
