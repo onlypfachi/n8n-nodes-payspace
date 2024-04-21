@@ -16,7 +16,7 @@ import {
 	employeeAddressApiOptions,
 	taxProfilesApiOptions,
 } from './options/employee.options';
-import * as PaySpaceUtils from './paySpace.utils';
+import { appendUrl, notEmpty } from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { companyEndpointCollectionsOptions } from './options/company.options';
@@ -29,7 +29,7 @@ export class PaySpace implements INodeType {
 		icon: 'file:ps.svg',
 		group: ['input'],
 		version: 1,
-		subtitle: `={{$parameter["operation"] === "getToken" || $parameter["operation"] === "getMetadata" ? $parameter["operation"] : $parameter["api"]}}`,
+		subtitle: `={{$parameter["operation"] === "authorization" || $parameter["operation"] === "getMetadata" ? $parameter["operation"] : $parameter["api"]}}`,
 		description: 'Use PaySpace API to manage your PaySpace account',
 		defaults: {
 			name: 'PaySpace',
@@ -111,14 +111,7 @@ export class PaySpace implements INodeType {
 						? 'https://staging-identity.yourhcm.com/connect/token'
 						: 'https://identity.yourhcm.com/connect/token';
 
-				let config: AxiosRequestConfig = {
-					method: 'post',
-					maxBodyLength: Infinity,
-					url: apiUrl,
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
+				let config: AxiosRequestConfig = {};
 				let companyId;
 				let paySpaceAccessToken;
 				const getMetadataResponse = {
@@ -130,16 +123,12 @@ export class PaySpace implements INodeType {
 					},
 				};
 
-				if (operation === 'getToken') {
+				if (operation === 'authorization') {
 					// Get access token
-					let scope = this.getNodeParameter('client_scope', i) as string;
-					const client_id = credentials.client_id;
-					const client_secret = credentials.client_secret;
-
 					const data: string = qs.stringify({
-						client_id: client_id,
-						client_secret: client_secret,
-						scope: scope,
+						client_id: credentials.client_id,
+						client_secret: credentials.client_secret,
+						scope: this.getNodeParameter('client_scope', i) as string,
 					});
 					config = {
 						method: 'post',
@@ -163,208 +152,223 @@ export class PaySpace implements INodeType {
 						},
 					};
 				} else if (operation === 'employee') {
+					config = {
+						maxBodyLength: Infinity,
+						headers: {
+							Authorization: paySpaceAccessToken,
+							'Content-Type': 'application/json',
+						},
+					};
 					const api = this.getNodeParameter('api', i) as string;
-					const additionalFields = this.getNodeParameter('additionalFields', i) as any;
-					companyId = this.getNodeParameter('companyId', i) as number;
+					companyId = this.getNodeParameter('companyId', i) as any;
 					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 					let baseURL: string;
+					let additionalFields;
+					let employeeId;
+					let data;
+					let effectiveDate;
+					let statusId;
+					let positionId;
 
-					switch (api) {
+					switch (
+						api //TODO: ADD DESCRIPTIONS TO OPTIONS
+					) {
 						case 'getACollectionOfEmployees':
 							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
+							config.method = 'get';
 							break;
 						case 'getACollectionOfEmployeesAsOfAnEffectiveDate':
-							const effectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
+							effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
+							additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee/effective/${effectiveDate}?`;
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
+							config.method = 'get';
 							break;
 						case 'getASingleEmployeeRecord':
-							const EmployeeIdSingle = this.getNodeParameter('dynamicParameter', i) as string;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${EmployeeIdSingle})`;
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							employeeId = this.getNodeParameter('employeeId', i) as string;
+							config.method = 'get';
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
 							break;
 						case 'createASingleEmployeeRecord':
-							const dataCreate = this.getNodeParameter('bodyData', i) as IDataObject;
-							const EmployeeIdCreate = this.getNodeParameter('dynamicParameter', i) as string;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${EmployeeIdCreate})`;
+							data = this.getNodeParameter('bodyData', i) as IDataObject;
+							employeeId = this.getNodeParameter('employeeId', i) as string;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
 							config.method = 'patch';
-							config.data = dataCreate;
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							config.data = data;
+
 							break;
 						case 'UpdateASingleEmployeeRecord':
-							const dataUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee`;
+							data = this.getNodeParameter('bodyData', i) as IDataObject;
+							employeeId = this.getNodeParameter('employeeId', i) as any;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
 							config.method = 'patch';
-							config.data = dataUpdate;
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							config.data = data;
+
 							break;
 						case 'downloadEmployeePhoto':
 							const FormDataDownload = require('form-data');
-							const EmployeeIdDownload = this.getNodeParameter('dynamicParameter', i) as string;
-							const baseURLDownload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${EmployeeIdDownload}/image/download`;
-							const dataDownload = new FormDataDownload();
-							config.url = baseURLDownload;
-							config.data = dataDownload;
+							employeeId = this.getNodeParameter('employeeId', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee/${employeeId}/image/download`;
+							data = new FormDataDownload();
+							config.data = data;
+							config.method = 'get';
 							config.headers = {
 								Authorization: paySpaceAccessToken,
-								...dataDownload.getHeaders(),
+								...data.getHeaders(),
 							};
 							break;
 						case 'uploadEmployeePhoto': //TODO: Implement upload logic
 							const FormDataUpload = require('form-data');
-							const EmployeeIdUpload = this.getNodeParameter('dynamicParameter', i) as string;
-							const baseURLUpload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${EmployeeIdUpload}/image/upload`;
-							const dataUpload = new FormDataUpload();
+							employeeId = this.getNodeParameter('employeeId', i) as string;
+							const baseURLUpload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${employeeId}/image/upload`;
+							data = new FormDataUpload();
 							config.url = baseURLUpload;
-							config.data = dataUpload;
+							config.method = 'post';
+							config.data = data;
 							config.headers = {
 								Authorization: paySpaceAccessToken,
-								...dataUpload.getHeaders(),
+								...data.getHeaders(),
 							};
 							break;
 						case 'getAnEmployeeAddress':
-							const EmployeeNumber = this.getNodeParameter('dynamicParameter', i) as string;
+							const EmployeeNumber = this.getNodeParameter('employeeNumber', i) as string;
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
-							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
+
 							break;
 						case 'updateASingleEmployeeAddressRecord':
-							const AddressId = this.getNodeParameter('dynamicParameter', i) as string;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${AddressId})`;
-							const dataAddressUpdate = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
+							const addressId = this.getNodeParameter('addressId', i) as string;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${addressId})`;
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject; //see "EmployeeAddress" in metadata endpoint for available fields
+							config.url = appendUrl(baseURL, additionalFields);
 							config.method = 'patch';
-							config.data = dataAddressUpdate; //see "EmployeeAddress" in metadata endpoint for available fields
 							config.headers = {
 								'Content-Type': 'application/json',
 							};
 							break;
 						case 'getACollectionOfEmploymentStatus':
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
-							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params);
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
 							config.method = 'get';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
 							break;
 						case 'getASingleEmploymentStatusRecord':
-							const StatusId = this.getNodeParameter('dynamicParameter', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${StatusId})`; //
+							statusId = this.getNodeParameter('statusId', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`; //
 							config.method = 'get';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+
 							break;
 						case 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate':
-							const EffectiveDate = this.getNodeParameter('dynamicParameter', i) as string;
-							config.url = PaySpaceUtils.appendUrl(
-								`${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${EffectiveDate}`,
-								additionalFields.params,
-							); //
+							effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(
+										`${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`,
+										additionalFields,
+								  )
+								: `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`; //
 							config.method = 'get';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+
 							break;
 						case 'getACollectionOfAllEmploymentStatuses':
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/all?`;
-							config.url = PaySpaceUtils.appendUrl(baseURL, additionalFields.params); //
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/all`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL; //
 							config.method = 'get';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+
 							break;
 						case 'createASingleEmploymentStatusRecord':
-							const EmployeeEmploymentStatus = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus`;
 							config.method = 'post';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
-							config.data = EmployeeEmploymentStatus; //see "EmployeeEmploymentStatus" in metadata endpoint for available fields
+
 							break;
 						case 'updateASingleEmploymentStatusRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							const EmploymentStatusId = this.getNodeParameter('dynamicParameter', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${EmploymentStatusId})`;
-
+							statusId = this.getNodeParameter('statusId', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
-							//see "EmployeeEmploymentStatus" in metadata endpoint for available fields
 							break;
 						case 'employmentStatusEmployeeTermination':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							this.getNodeParameter('dynamicParameter', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
-								this.getNodeParameter('dynamicParameter', i) as string
-							})`;
-
+							statusId = this.getNodeParameter('statusId', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
 							break;
 						case 'employmentStatusReinstateSameRecord':
-							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-
+							statusId = this.getNodeParameter('statusId', i) as string;
 							config.method = 'patch';
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
-								this.getNodeParameter('dynamicParameter', i) as string
-							})`;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							break;
 						case 'employmentStatusReinstateWithNewTaxRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-
+							statusId = this.getNodeParameter('statusId', i) as string;
 							config.method = 'patch';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
-								this.getNodeParameter('dynamicParameter', i) as string
-							})`;
-							config.headers = {
-								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
-							};
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+
 							break;
 						case 'deleteASingleEmploymentStatusRecord':
 							config.method = 'delete';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${
-								this.getNodeParameter('dynamicParameter', i) as string
-							})`;
+							statusId = this.getNodeParameter('statusId', i) as string;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+
+							break;
+						case 'getACollectionOfPositions':
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
+							config.method = 'get';
+							break;
+						case 'getASinglePositionRecord':
+							positionId = this.getNodeParameter('positionId', i) as any;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.method = 'get';
+							break;
+						case 'getACollectionOfPositionsAsOfAnEffectiveDate':
+							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition/effective/${effectiveDate}`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
 							config.headers = {
 								Authorization: paySpaceAccessToken,
-								'content-type': 'application/json',
 							};
+							break;
+						case 'createASinglePositionRecord':
+							positionId = this.getNodeParameter('positionId', i) as any;
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.method = 'post';
+							break;
+						case 'updateASinglePositionRecord':
+							positionId = this.getNodeParameter('positionId', i) as any;
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.method = 'patch';
+							break;
+						case 'deleteASinglePositionRecord':
+							positionId = this.getNodeParameter('positionId', i) as string;
+							config.method = 'delete';
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
 							break;
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown

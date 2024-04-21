@@ -3,7 +3,7 @@ import { INodeProperties } from 'n8n-workflow';
 export const operationsOptions = [
 	{
 		name: 'Authentication',
-		value: 'getToken',
+		value: 'authorization',
 	},
 	{
 		name: 'Get Metadata',

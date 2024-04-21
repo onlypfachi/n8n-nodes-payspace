@@ -27,7 +27,7 @@ export const properties: INodeProperties[] = [
 		type: 'options',
 		noDataExpression: true,
 		options: operationsOptions,
-		default: 'employee',
+		default: 'authorization',
 		description: 'Which operation to use?',
 	},
 	{
@@ -94,7 +94,8 @@ export const properties: INodeProperties[] = [
 			'Api related to operation. Choose from the list <a href="https://developer.payspace.com/">list</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
-		displayName: 'This node is still in development: If any of the above options or property is not loaded please save the workflow and reopen the node',
+		displayName:
+			'This node is still in development: If any of the above options or property is not loaded please save the workflow and reopen the node',
 		name: 'notice',
 		type: 'notice',
 		default: '',
@@ -121,12 +122,12 @@ export const properties: INodeProperties[] = [
 				operation: ['getMetadata', 'employee', 'company'],
 			},
 		},
-		placeholder: '123456789',
+		placeholder: 'The Company ID',
 	},
 
 	{
 		displayName: 'Status ID',
-		name: 'StatusId',
+		name: 'statusId',
 		type: 'string',
 		default: '',
 		description: 'Enter the status ID associated',
@@ -153,6 +154,7 @@ export const properties: INodeProperties[] = [
 				api: [
 					'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
 					'getACollectionOfEmployeesAsOfAnEffectiveDate',
+					'getACollectionOfPositionsAsOfAnEffectiveDate',
 				],
 			},
 		},
@@ -165,7 +167,13 @@ export const properties: INodeProperties[] = [
 		description: 'Enter the employee ID associated',
 		displayOptions: {
 			show: {
-				api: ['getASingleEmployeeRecord'],
+				api: [
+					'getASingleEmployeeRecord',
+					'createASingleEmployeeRecord',
+					'UpdateASingleEmployeeRecord',
+					'downloadEmployeePhoto',
+					'uploadEmployeePhoto',
+				],
 			},
 		},
 	},
@@ -194,24 +202,44 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Data (JSON)',
+		displayName: 'Position ID',
+		name: 'positionId',
+		type: 'string',
+		default: '',
+		description: 'Enter the EmployeePositionId',
+		displayOptions: {
+			show: {
+				api: ['getASinglePositionRecord', 'createASinglePositionRecord'],
+			},
+		},
+	},
+	{
+		displayName: 'Body (Raw)',
 		name: 'bodyData',
 		type: 'json',
-		default: { key: 'value' },
-		placeholder: PaySpaceUtils.getBodyDataPlaceholder('{{ $parameter["api"] }}'),
-		description: 'Body data that needs to be passed in the URL as body JSON',
+		default: `{ "key": "value" }`,
+		placeholder: `{"key":"value"}`,
+		description: 'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
 		displayOptions: {
 			show: {
 				api: [
 					'updateASingleEmployeeAddressRecord',
 					'createASingleEmployeeRecord',
 					'employmentStatusReinstateSameRecord',
+					'createASingleEmploymentStatusRecord',
+					'updateASingleEmploymentStatusRecord',
+					'employmentStatusEmployeeTermination',
+					'employmentStatusReinstateWithNewTaxRecord',
+					'employmentStatusReinstateSameRecord',
+					'getACollectionOfPositions',
+
+
 				],
 			},
 		},
 	},
 	{
-		displayName: 'Additional Optional Params',
+		displayName: 'PARAMS',
 		name: 'additionalFields',
 		placeholder: 'Additional optional params',
 		type: 'fixedCollection',
@@ -236,6 +264,9 @@ export const properties: INodeProperties[] = [
 					'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
 					'getACollectionOfEmployeesAsOfAnEffectiveDate',
 					'updateASingleEmploymentStatusRecord',
+					'getACollectionOfEmploymentStatus',
+					'getACollectionOfEmployees',
+
 				],
 			},
 		},
