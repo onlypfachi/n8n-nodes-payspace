@@ -1,6 +1,5 @@
 import { INodeProperties } from 'n8n-workflow';
 import { operationsOptions, paramsOptions, scopeOptions } from './options/main.options';
-import * as PaySpaceUtils from './paySpace.utils';
 
 export const properties: INodeProperties[] = [
 	{

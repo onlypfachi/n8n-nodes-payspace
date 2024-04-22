@@ -382,8 +382,8 @@ export class PaySpace implements INodeType {
 				}
 
 				const response = config; /*: AxiosResponse = await axios(config)*/
-				responseData =
-					operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
+				responseData = [{response}]
+					// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
