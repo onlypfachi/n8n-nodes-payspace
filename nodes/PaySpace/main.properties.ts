@@ -1,5 +1,5 @@
 import { INodeProperties } from 'n8n-workflow';
-import { operationsOptions, paramsOptions, scopeOptions } from './options/main.options';
+import { displayBodyRaw, dynamicIdDisplayArray, operationsOptions, paramsOptions, scopeOptions } from './options/main.options';
 
 export const properties: INodeProperties[] = [
 	{
@@ -125,24 +125,6 @@ export const properties: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'Status ID',
-		name: 'statusId',
-		type: 'string',
-		default: '',
-		description: 'Enter the status ID associated',
-		displayOptions: {
-			show: {
-				api: [
-					'getASingleEmploymentStatusRecord',
-					'updateASingleEmploymentStatusRecord',
-					'employmentStatusEmployeeTermination',
-					'employmentStatusReinstateWithNewTaxRecord',
-					'employmentStatusReinstateSameRecord',
-				],
-			},
-		},
-	},
-	{
 		displayName: 'Effective Date',
 		name: 'effectiveDate',
 		type: 'dateTime',
@@ -154,24 +136,6 @@ export const properties: INodeProperties[] = [
 					'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
 					'getACollectionOfEmployeesAsOfAnEffectiveDate',
 					'getACollectionOfPositionsAsOfAnEffectiveDate',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Employee ID',
-		name: 'employeeId',
-		type: 'string',
-		default: '',
-		description: 'Enter the employee ID associated',
-		displayOptions: {
-			show: {
-				api: [
-					'getASingleEmployeeRecord',
-					'createASingleEmployeeRecord',
-					'UpdateASingleEmployeeRecord',
-					'downloadEmployeePhoto',
-					'uploadEmployeePhoto',
 				],
 			},
 		},
@@ -189,26 +153,14 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Address ID',
-		name: 'addressId',
-		type: 'string',
-		default: '',
-		description: 'Enter the address ID associated',
-		displayOptions: {
-			show: {
-				api: ['updateASingleEmployeeAddressRecord'],
-			},
-		},
-	},
-	{
-		displayName: 'Position ID',
-		name: 'positionId',
+		displayName: 'ID',
+		name: 'Id',
 		type: 'string',
 		default: '',
 		description: 'Enter the EmployeePositionId',
 		displayOptions: {
 			show: {
-				api: ['getASinglePositionRecord', 'createASinglePositionRecord'],
+				api: dynamicIdDisplayArray,
 			},
 		},
 	},
@@ -221,19 +173,7 @@ export const properties: INodeProperties[] = [
 		description: 'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
 		displayOptions: {
 			show: {
-				api: [
-					'updateASingleEmployeeAddressRecord',
-					'createASingleEmployeeRecord',
-					'employmentStatusReinstateSameRecord',
-					'createASingleEmploymentStatusRecord',
-					'updateASingleEmploymentStatusRecord',
-					'employmentStatusEmployeeTermination',
-					'employmentStatusReinstateWithNewTaxRecord',
-					'employmentStatusReinstateSameRecord',
-					'getACollectionOfPositions',
-
-
-				],
+				api: displayBodyRaw,
 			},
 		},
 	},
@@ -265,7 +205,7 @@ export const properties: INodeProperties[] = [
 					'updateASingleEmploymentStatusRecord',
 					'getACollectionOfEmploymentStatus',
 					'getACollectionOfEmployees',
-
+					'getACollectionOfBankDetailRecords',
 				],
 			},
 		},

@@ -104,8 +104,8 @@ export class PaySpace implements INodeType {
 				const environment = this.getNodeParameter('environment', i) as string;
 				const apiUrl: string =
 					environment === 'staging'
-						? 'https://apistaging.payspace.com'
-						: 'https://api.payspace.com';
+						? 'https://apistaging.payspace.com/odata/v1.1/'
+						: 'https://api.payspace.com/odata/v1.1/';
 				const authenticationUrl: string =
 					environment === 'staging'
 						? 'https://staging-identity.yourhcm.com/connect/token'
@@ -169,6 +169,8 @@ export class PaySpace implements INodeType {
 					let effectiveDate;
 					let statusId;
 					let positionId;
+					let bankDetailId;
+					let dependantId;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
@@ -328,7 +330,7 @@ export class PaySpace implements INodeType {
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
 
 							break;
-						case 'getACollectionOfPositions':
+						case 'getACollectionOfPositions': //Position
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition`;
 							config.url = notEmpty(additionalFields)
@@ -370,6 +372,69 @@ export class PaySpace implements INodeType {
 							config.method = 'delete';
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
 							break;
+						case 'getACollectionOfBankDetailRecords': //Bank Details
+							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail?`;
+							config.method = 'get';
+							additionalFields = additionalFields = this.getNodeParameter(
+								'additionalFields',
+								i,
+							) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
+							break;
+						case 'getASingleBankDetailRecord':
+							bankDetailId = this.getNodeParameter('bankDetailId', i) as any;
+							config.method = 'get';
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							break;
+						case 'createASingleBankDetailRecord':
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail`;
+							config.method = 'post';
+							break;
+						case 'updateASingleBankDetailRecord':
+							bankDetailId = this.getNodeParameter('Id', i) as any
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							config.method = 'patch';
+							break;
+						case 'deleteASingleBankDetailRecord':
+							config.method = 'delete';
+							bankDetailId = this.getNodeParameter('Id', i) as any
+							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							break;
+						case 'getACollectionOfDependants':         //Dependants
+							config.method = 'get'
+							additionalFields = this.getNodeParameter('additionalFields', i) as any
+							baseURL = `${apiUrl}${companyId}/EmployeeDependant`
+							config.url = notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL
+							break;
+						case 'getASingleDependantRecord':
+							config.method = 'get'
+							dependantId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`
+							break;
+						case 'createASingleDependantRecord':
+							config.method = 'post'
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}${companyId}/EmployeeDependant`
+							break;
+						case 'updateASingleDependantRecord':
+							config.method = 'patch'
+							dependantId = this.getNodeParameter('Id', i) as any
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
+							break;
+						case 'deleteASingleDependantRecord':
+							config.method = 'delete'
+							dependantId = this.getNodeParameter('Id', i) as any
+							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
+							break;
+						case 'dependantQuickAdd':
+							config.method = 'post'
+							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
+							config.url = `${apiUrl}${companyId}/EmployeeDependantQuickAdd`
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
 							throw new Error('Invalid Operation');
@@ -382,8 +447,8 @@ export class PaySpace implements INodeType {
 				}
 
 				const response = config; /*: AxiosResponse = await axios(config)*/
-				responseData = [{response}]
-					// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
+				responseData = [{ response }];
+				// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),

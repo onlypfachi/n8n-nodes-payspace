@@ -98,7 +98,7 @@ export const paramsOptions: INodeProperties[] = [
 	},
 ];
 
-export const dynamicDisplayNameApiDisplayArray= [
+export const dynamicIdDisplayArray= [ //this array contains all apis that require ID parameter
 	'getACollectionOfEmployeesAsOfAnEffectiveDate',
 	'uploadEmployeePhoto',
 	'downloadEmployeePhoto',
@@ -108,4 +108,37 @@ export const dynamicDisplayNameApiDisplayArray= [
 	'employmentStatusReinstateWithNewTaxRecord',
 	'deleteASingleEmploymentStatusRecord',
 	'employmentStatusEmployeeTermination',
+	'updateASingleBankDetailRecord',
+	'getASingleDependantRecord',
+	'updateASingleDependantRecord',
+	'deleteASingleDependantRecord',
+	'getASinglePositionRecord', 'createASinglePositionRecord','updateASingleEmployeeAddressRecord',
+	'getASingleEmployeeRecord',
+	'createASingleEmployeeRecord',
+	'UpdateASingleEmployeeRecord',
+	'downloadEmployeePhoto',
+	'uploadEmployeePhoto',
+	'getASingleEmploymentStatusRecord',
+	'updateASingleEmploymentStatusRecord',
+	'employmentStatusEmployeeTermination',
+	'employmentStatusReinstateWithNewTaxRecord',
+	'employmentStatusReinstateSameRecord',
+];
+
+
+export const displayBodyRaw = [ //this array contains all apis that require to be passed in raw data as json
+	'updateASingleEmployeeAddressRecord',
+	'createASingleEmployeeRecord',
+	'employmentStatusReinstateSameRecord',
+	'createASingleEmploymentStatusRecord',
+	'updateASingleEmploymentStatusRecord',
+	'employmentStatusEmployeeTermination',
+	'employmentStatusReinstateWithNewTaxRecord',
+	'employmentStatusReinstateSameRecord',
+	'getACollectionOfPositions',
+	'dependantQuickAdd',
+	'updateASingleDependantRecord',
+	'createASingleDependantRecord',
+	'updateASingleBankDetailRecord',
+
 ];
