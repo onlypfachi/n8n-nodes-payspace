@@ -15,6 +15,13 @@ import {
 	biographicalApiOptions,
 	employeeAddressApiOptions,
 	taxProfilesApiOptions,
+	performanceManagementEndpointsCollectionOptions,
+	skillsEndpointsCollectionOptions,
+	suspensionEndpointsCollectionOptions,
+	payrollResultsEndpointsCollectionOptions,
+	costingEndpointsCollectionOptions,
+	leaveEndpointsCollectionOptions,
+	otherEndpointsCollectionOptions,
 } from './options/employee.options';
 import { appendUrl, notEmpty } from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
@@ -70,6 +77,20 @@ export class PaySpace implements INodeType {
 						return basicInformationEndpointsCollectionOptions;
 					case 'payrollProcessing':
 						return payrollProcessingEndpointsCollectionOptions;
+					case 'Payroll Results':
+						return payrollResultsEndpointsCollectionOptions;
+					case 'performanceManagement':
+						return performanceManagementEndpointsCollectionOptions;
+					case 'skills':
+						return skillsEndpointsCollectionOptions;
+					case 'Suspension':
+						return suspensionEndpointsCollectionOptions;
+					case 'costing':
+						return costingEndpointsCollectionOptions;
+					case 'leave':
+						return leaveEndpointsCollectionOptions;
+					case 'other':
+						return otherEndpointsCollectionOptions;
 					default:
 						return [];
 				}
@@ -114,14 +135,14 @@ export class PaySpace implements INodeType {
 				let config: AxiosRequestConfig = {};
 				let companyId;
 				let paySpaceAccessToken;
-				const getMetadataResponse = {
-					json: {
-						success: true,
-						message: 'Successfully got data',
-						config:
-							'The response data is too large to display. Use Postman to view the response. https://www.postman.com/',
-					},
-				};
+				// const getMetadataResponse = {
+				// 	json: {
+				// 		success: true,
+				// 		message: 'Successfully got data',
+				// 		config:
+				// 			'The response data is too large to display. Use Postman to view the response. https://www.postman.com/',
+				// 	},
+				// };
 
 				if (operation === 'authorization') {
 					// Get access token
@@ -394,47 +415,51 @@ export class PaySpace implements INodeType {
 							config.method = 'post';
 							break;
 						case 'updateASingleBankDetailRecord':
-							bankDetailId = this.getNodeParameter('Id', i) as any
+							bankDetailId = this.getNodeParameter('Id', i) as any;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							config.method = 'patch';
 							break;
 						case 'deleteASingleBankDetailRecord':
 							config.method = 'delete';
-							bankDetailId = this.getNodeParameter('Id', i) as any
+							bankDetailId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							break;
-						case 'getACollectionOfDependants':         //Dependants
-							config.method = 'get'
-							additionalFields = this.getNodeParameter('additionalFields', i) as any
-							baseURL = `${apiUrl}${companyId}/EmployeeDependant`
-							config.url = notEmpty(additionalFields) ? appendUrl(baseURL, additionalFields) : baseURL
+						case 'getACollectionOfDependants': //Dependants
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeDependant`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields)
+								: baseURL;
 							break;
 						case 'getASingleDependantRecord':
-							config.method = 'get'
+							config.method = 'get';
 							dependantId = this.getNodeParameter('Id', i) as any;
-							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`
+							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
 							break;
 						case 'createASingleDependantRecord':
-							config.method = 'post'
+							config.method = 'post';
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}${companyId}/EmployeeDependant`
+							config.url = `${apiUrl}${companyId}/EmployeeDependant`;
 							break;
 						case 'updateASingleDependantRecord':
-							config.method = 'patch'
-							dependantId = this.getNodeParameter('Id', i) as any
+							config.method = 'patch';
+							dependantId = this.getNodeParameter('Id', i) as any;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
 							break;
 						case 'deleteASingleDependantRecord':
-							config.method = 'delete'
-							dependantId = this.getNodeParameter('Id', i) as any
+							config.method = 'delete';
+							dependantId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
 							break;
 						case 'dependantQuickAdd':
-							config.method = 'post'
+							config.method = 'post';
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}${companyId}/EmployeeDependantQuickAdd`
+							config.url = `${apiUrl}${companyId}/EmployeeDependantQuickAdd`;
+							break;
+
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
 							throw new Error('Invalid Operation');
