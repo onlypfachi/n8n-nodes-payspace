@@ -1147,7 +1147,16 @@ export const recurringCostingSplitApiOptions = [
 	}
 ];
 
-export const employeeReviewHeaderApiOptions =[];
-export const employeeReviewKPAApiOptions =[];
-export const employeeReviewTemplateApiOptions =[];
+export const employeeReviewHeaderApiOptions =[{
+	name: 'Get Collection',
+	value: 'getCollection',
+},];
+export const employeeReviewKPAApiOptions =[{
+	name: 'Get Collection',
+	value: 'getCollection',
+},];
+export const employeeReviewTemplateApiOptions =[{
+	name: 'Get Collection',
+	value: 'getCollection',
+},];
 
