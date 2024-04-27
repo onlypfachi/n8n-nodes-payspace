@@ -145,7 +145,12 @@ export const leaveEndpointsCollectionOptions: INodePropertyOptions[] = [
 		value: 'application',
 	},
 ];
-export const suspensionEndpointsCollectionOptions: INodePropertyOptions[] = [];
+export const suspensionEndpointsCollectionOptions: INodePropertyOptions[] = [
+	{
+		name: 'Suspension',
+		value: 'suspension',
+	}
+];
 export const otherEndpointsCollectionOptions: INodePropertyOptions[] = [
 	{
 		name: 'Out Of Office',
@@ -389,7 +394,7 @@ export const attachmentsApiOptions = [
 	},
 	{
 		name: 'Get a Single Employee Attachment Record',
-		value: 'getASingleEmployeeAttachmentRecord'
+		value: 'getASingleEmployeeAttachmentRecord',
 	},
 	{
 		name: 'Create a Single Employee Attachment Record',
@@ -402,56 +407,747 @@ export const attachmentsApiOptions = [
 	{
 		name: 'Delete a Single Employee Attachment',
 		value: 'deleteASingleEmployeeAttachment',
-	}
+	},
 ];
 export const projectDetailsApiOptions = [
 	{
 		name: 'Get a Collection of Projects',
-		value: 'getACollectionOfProjects'
+		value: 'getACollectionOfProjects',
 	},
 	{
 		name: 'Get a Collection of Projects as of an Effective Date',
-		value: 'getACollectionOfProjectsAsOfAnEffectiveDate'
+		value: 'getACollectionOfProjectsAsOfAnEffectiveDate',
 	},
 	{
 		name: 'Get a Single Project Record',
-		value: 'getASingleProjectRecord'
+		value: 'getASingleProjectRecord',
 	},
 	{
 		name: 'Create a Single Project Record',
-		value: 'createASingleProjectRecord'
+		value: 'createASingleProjectRecord',
 	},
 	{
 		name: 'Update a Single Project Record',
-		value: 'updateASingleProjectRecord'
+		value: 'updateASingleProjectRecord',
 	},
 	{
 		name: 'Delete a Single Project Record',
-		value: 'deleteASingleProjectRecord'
-	}
-
+		value: 'deleteASingleProjectRecord',
+	},
 ];
 export const assetApiOptions = [
 	{
-		name: '',
-		value: ''
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Get Single Record',
+		value: 'getSingleRecord',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Single Record',
+		value: 'updateSingleRecord',
+	},
+	{
+		name: 'Delete Single Record',
+		value: 'deleteSingleRecord',
 	},
 ];
 export const employeeCustomFormsApiOptions = [
 	{
-		name: '',
-		value: ''
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Get Collection by Category',
+		value: 'getCollectionByCategory',
+	},
+	{
+		name: 'Get Single',
+		value: 'getSingle',
+	},
+	{
+		name: 'Post',
+		value: 'post',
+	},
+	{
+		name: 'PATCH',
+		value: 'patch',
+	},
+	{
+		name: 'Delete',
+		value: 'delete',
 	},
 ];
 export const employeeInboxApiOptions = [
 	{
-		name: '',
-		value: ''
+		name: 'Get Collection',
+		value: 'getCollection',
 	},
 ];
 export const incidentManagementApiOptions = [
 	{
-		name: '',
-		value: ''
+		name: 'Get a Collection',
+		value: 'getACollection',
+	},
+	{
+		name: 'Get Single',
+		value: 'getSingle',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Single Record',
+		value: 'updateSingleRecord',
+	},
+	{
+		name: 'Delete Single Record',
+		value: 'deleteSingleRecord',
 	},
 ];
+export const payRateDetailsApiOptions = [
+	{
+		name: 'Get a Collection of Pay Rates',
+		value: 'getACollectionOfPayRates',
+	},
+	{
+		name: 'Get a Single Pay Rate Record',
+		value: 'getASinglePayRateRecord',
+	},
+	{
+		name: 'Get a Collection of Pay Rates as of an Effective Date',
+		value: 'getACollectionOfPayRatesAsOfAnEffectiveDate',
+	},
+	{
+		name: 'Create a Single Pay Rate Record',
+		value: 'createASinglePayRateRecord',
+	},
+	{
+		name: 'Update a Single Pay Rate Record',
+		value: 'updateASinglePayRateRecord',
+	},
+	{
+		name: 'Delete a Single Pay Rate Record',
+		value: 'deleteASinglePayRateRecord',
+	},
+];
+export const recurringComponentsNestedOptions = [
+	// Load endpoints not APIs
+
+	{
+		name: 'Bonus Provision',
+		value: 'bonusProvision',
+	},
+	{
+		name: 'Company Car',
+		value: 'companyCar',
+	},
+	{
+		name: 'Employee Components',
+		value: 'employeeComponents',
+	},
+	{
+		name: 'Group Life',
+		value: 'groupLife',
+	},
+	{
+		name: 'Income Protection',
+		value: 'incomeProtection',
+	},
+	{
+		name: 'Medical Aid',
+		value: 'medicalAid',
+	},
+	{
+		name: 'Saving',
+		value: 'saving',
+	},
+	{
+		name: 'Travel Business Usage',
+		value: 'travelBusinessUsage',
+	},
+	{
+		name: 'Garnishees',
+		value: 'garnishees',
+	},
+	{
+		name: 'Unions',
+		value: 'unions',
+	},
+	{
+		name: 'Disability',
+		value: 'disability',
+	},
+	{
+		name: 'Retirement Annuity',
+		value: 'retirementAnnuity',
+	},
+	{
+		name: 'Pension',
+		value: 'pension',
+	},
+	{
+		name: 'Loans',
+		value: 'loans',
+	},
+	{
+		name: 'House Payment',
+		value: 'housePayment',
+	},
+];
+export const takeOnYearToDateFiguresApiOptions = [
+	{
+		name: 'Get a Collection of Take on Records',
+		value: 'getACollectionOfTakeOnRecords',
+	},
+	{
+		name: 'Get a Single Take on Record',
+		value: 'getACollectionOfTakeOnRecord',
+	},
+	{
+		name: 'Create a Single Take on Record',
+		value: 'createACollectionOfTakeOnRecord',
+	},
+	{
+		name: 'Update a Single Take on Record',
+		value: 'updateASingleOfTakeOnRecord',
+	},
+];
+
+export const recurringTemplatesApiOptions = [
+	{
+		name: 'Add a Single Recurring Template to an Employee',
+		value: 'addASingleRecurringTemplateToAnEmployee',
+	},
+];
+export const claimsApiOptions = [
+
+	{
+		name: 'Get a Collection of Claims',
+		value: 'getACollectionOfClaims',
+	},
+	{
+		name: 'Get a Single Employee Claim Record',
+		value: 'getASingleEmployeeClaimRecord',
+	},
+	{
+		name: 'Create a Single Employee Claim Record',
+		value: 'createASingleEmployeeClaimRecord',
+	},
+	{
+		name: 'Upload Claim Attachment',
+		value: 'uploadClaimAttachment',
+	},
+	{
+		name: 'Update a Single Employee Claim Record',
+		value: 'updateASingleEmployeeClaimRecord',
+	},
+	{
+		name: 'Delete a Single Employee Claim Record',
+		value: 'deleteASingleEmployeeClaimRecord',
+	},
+	{
+		name: 'Submit Employee Claim Batch for Workflow',
+		value: 'submitEmployeeClaimBatchForWorkflow',
+	},
+];
+export const claimEmployeeWorkflowApiOptions = [
+	{
+		name: 'Get a Single Employee Workflow Record',
+		value: 'getASingleEmployeeWorkflowRecord',
+	},
+	{
+		name: 'Submit Workflow Step',
+		value: 'submitWorkflowStep',
+	},
+];
+
+// TODO: map recurring components nested endpoints to api
+// TODO: remove duplications
+
+export const bonusProvisionApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const companyCarApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const employeeComponentsApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+
+];
+export const groupLifeApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const incomeProtectionApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const medicalAidApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+
+];
+export const savingApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const travelBusinessUsageApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+
+];
+export const garnisheesApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const unionsApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const disabilityApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const retirementAnnuityApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const pensionApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const loansApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const housePaymentApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+
+export const payslipsApiOptions = [
+
+	{
+		name: 'Get a Collection of Payslips',
+		value: 'getACollectionOfPayslips',
+	},
+	{
+		name: 'Get a Collection of Payslips Lines',
+		value: 'getACollectionOfPayslipsLines',
+	},
+	{
+		name: 'Get a Collection of Costed Payslips Lines',
+		value: 'getACollectionOfCostedPayslipsLines',
+	},
+	{
+		name: 'Get a Collection of Consolidated Payslips',
+		value: 'getACollectionOfConsolidatedPayslips',
+	},
+	{
+		name: 'Get a Collection of Payslip PDFs',
+		value: 'getACollectionOfPayslipsPDFs',
+	},
+	{
+		name: 'Update Payslip Comment',
+		value: 'updatePayslipComment',
+	},
+	{
+		name: 'Get a Single Payslip PDF',
+		value: 'getASinglePayslipPDF',
+	},
+];
+export const editPayslipApiOptions = [
+	{
+		name: 'Get a Collection of Edit Payslip Records',
+		value: 'getACollectionOfEditPayslipRecords',
+	},
+	{
+		name: 'Get a Single Edit Payslip Record',
+		value: 'getASingleEditPayslipRecord',
+	},
+	{
+		name: 'Create a Single Edit Payslip Record',
+		value: 'createASingleEditPayslipRecord',
+	},
+	{
+		name: 'Update a Single Edit Payslip Record',
+		value: 'updateASingleEditPayslipRecord',
+	},
+	{
+		name: 'Batch Updates',
+		value: 'batchUpdates',
+	},
+	{
+		name: 'Delete a Single Edit Payslip Record',
+		value: 'deleteASingleEditPayslipRecord',
+	},
+];
+export const taxCertificatesApiOptions = [
+	{
+		name: 'Get a Collection of Tax Certificates',
+		value: 'getACollectionOfTaxCertificates',
+	},
+];
+export const adjustmentsApiOptions = [
+
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Get Collection By Period',
+		value: 'getCollectionByPeriod',
+	},
+	{
+		name: 'Get Single',
+		value: 'getSingle',
+	},
+	{
+		name: 'Patch Existing',
+		value: 'patchExisting',
+	},
+	{
+		name: 'Create New',
+		value: 'createNew',
+	},
+	{
+		name: 'Delete Existing',
+		value: 'deleteExisting',
+	},
+	{
+		name: '[OBSOLETE] Get a Collection of Leave Transactions',
+		value: 'getACollectionOfLeaveTransactions',
+	},
+];
+export const setupApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create New',
+		value: 'createNew',
+	},
+	{
+		name: 'Get Single',
+		value: 'getSingle',
+	},
+	{
+		name: 'Delete Existing',
+		value: 'deleteExisting',
+	}
+];
+export const applicationApiOptions = [
+
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Get Collection By Period',
+		value: 'getCollectionByPeriod',
+	},
+	{
+		name: 'Get Single',
+		value: 'getSingle',
+	},
+	{
+		name: 'Patch Existing',
+		value: 'patchExisting',
+	},
+	{
+		name: 'Create New',
+		value: 'createNew',
+	},
+	{
+		name: 'Delete Existing',
+		value: 'deleteExisting',
+	},
+];
+
+export const suspensionApiOptions = [
+
+	{
+		name: 'Get a Collection of Suspensions',
+		value: 'getACollectionOfSuspensions',
+	},
+	{
+		name: 'Get a Single Suspension Record',
+		value: 'getASingleSuspensionRecord',
+	},
+	{
+		name: 'Create a Single Suspension Record',
+		value: 'createASingleSuspensionRecord',
+	},
+	{
+		name: 'Update a Single Suspension Record',
+		value: 'updateASingleSuspensionRecord',
+	},
+	{
+		name: 'Delete a Single Suspension Record',
+		value: 'deleteASingleSuspensionRecord',
+	},
+];
+export const simpleApiOptions = [ // TODO: simpleApiOptions
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{
+		name: 'Create Record',
+		value: 'createRecord',
+	},
+	{
+		name: 'Update Existing Record',
+		value: 'updateExistingRecord',
+	},
+	{
+		name: 'Delete Existing Record',
+		value: 'deleteExistingRecord',
+	}
+];
+export const outOfOfficeApiOptions = simpleApiOptions // using simpleApiOptions
+
+export const notesApiOptions = simpleApiOptions
+
+export const employeeTrainingApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
+export const employeeQualificationsApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
+export const employeeSkillsApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
+
+export const recurringCostingSplitApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+	{ name: 'Get a Collection as of an Effective Date',
+		value: 'getACollectionAsOfAnEffectiveDate',
+	},
+	{ name: 'Get a Collection of All Records',
+		value: 'getACollectionOfAllRecords',
+	}
+];
+
+export const employeeReviewHeaderApiOptions =[];
+export const employeeReviewKPAApiOptions =[];
+export const employeeReviewTemplateApiOptions =[];
+
