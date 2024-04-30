@@ -12,9 +12,6 @@ import {
 	employeeEndpointCollectionsOptions,
 	basicInformationEndpointsCollectionOptions,
 	payrollProcessingEndpointsCollectionOptions,
-	biographicalApiOptions,
-	employeeAddressApiOptions,
-	taxProfilesApiOptions,
 	performanceManagementEndpointsCollectionOptions,
 	skillsEndpointsCollectionOptions,
 	suspensionEndpointsCollectionOptions,
@@ -23,11 +20,13 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, notEmpty } from './paySpace.utils';
+import { appendUrl, notEmpty, apiArray } from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { companyEndpointCollectionsOptions } from './options/company.options';
 import { properties } from './main.properties';
+import { lookUpValueApiOptions } from './options/lookupValues.options';
+import { webhooksApiOptions } from './options/webhooks.options';
 
 export class PaySpace implements INodeType {
 	description: INodeTypeDescription = {
@@ -65,7 +64,7 @@ export class PaySpace implements INodeType {
 					case 'company':
 						return companyEndpointCollectionsOptions;
 					default:
-						return [];
+						return []
 				}
 			},
 
@@ -96,18 +95,15 @@ export class PaySpace implements INodeType {
 				}
 			},
 			async getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				let endpoint = this.getCurrentNodeParameter('endpoint') as string;
+				let operation = this.getCurrentNodeParameter('operation') as string;
 
-				switch (endpoint) {
-					case 'biographical':
-						return biographicalApiOptions;
-					case 'employeeAddress':
-						return employeeAddressApiOptions;
-					case 'taxProfiles':
-						return taxProfilesApiOptions;
-					default:
-						// Handle default case (if needed)
-						return [];
+				if (operation === 'lookupValue') {
+					return lookUpValueApiOptions;
+				} else if (operation === 'webhook') {
+					return webhooksApiOptions;
+				} else {
+					let endpoint = this.getCurrentNodeParameter('endpoint') as string;
+					return apiArray[endpoint];
 				}
 			},
 		},
@@ -135,6 +131,7 @@ export class PaySpace implements INodeType {
 				let config: AxiosRequestConfig = {};
 				let companyId;
 				let paySpaceAccessToken;
+				let additionalFields;
 				// const getMetadataResponse = {
 				// 	json: {
 				// 		success: true,
@@ -184,7 +181,7 @@ export class PaySpace implements INodeType {
 					companyId = this.getNodeParameter('companyId', i) as any;
 					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 					let baseURL: string;
-					let additionalFields;
+
 					let employeeId;
 					let data;
 					let effectiveDate;
@@ -467,8 +464,33 @@ export class PaySpace implements INodeType {
 					}
 				} else if (operation === 'company') {
 				} else if (operation === 'lookUpValue') {
+					let lookUpValueApi = this.getNodeParameter('api', i) as string;
+					additionalFields = this.getNodeParameter('additionalFields', i) as any;
+					config = {
+						method: 'get',
+						maxBodyLength: Infinity,
+						url: appendUrl(`${apiUrl}${companyId}${lookUpValueApi}?`, additionalFields),
+						headers: {
+							Authorization: paySpaceAccessToken,
+							'Content-Type': 'application/json',
+						},
+					};
 				} else if (operation === 'fileUpload') {
 				} else if (operation === 'webhooks') {
+					const entityType = this.getNodeParameter('entityType', i) as string;
+					const fromDate = this.getNodeParameter('fromDate', i) as string;
+					const toDate = this.getNodeParameter('toDate', i) as string;
+					const pageNumber = this.getNodeParameter('pageNumber', i) as string;
+					const pageSize = this.getNodeParameter('entityType', i) as string;
+					config = {
+						method: 'get',
+						maxBodyLength: Infinity,
+						url: `${apiUrl}${companyId}/WebhookError/${entityType}?from=${fromDate}&to=${toDate}&pageNumber=${pageNumber}&pageSize=${pageSize} `,
+						headers: {
+							Authorization: paySpaceAccessToken,
+							'content-type': 'application/json',
+						},
+					};
 				}
 
 				const response = config; /*: AxiosResponse = await axios(config)*/

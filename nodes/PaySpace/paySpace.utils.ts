@@ -1,4 +1,6 @@
-import { IDataObject } from 'n8n-workflow';
+import { AxiosRequestConfig } from 'axios';
+import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
+import { biographicalApiOptions, employeeAddressApiOptions, taxProfilesApiOptions } from './options/employee.options';
 
 /**
  * Appends query parameters to a base URL.
@@ -9,7 +11,7 @@ import { IDataObject } from 'n8n-workflow';
  *
  * Returns the base URL with the query string appended.
  */
-export const appendUrl = (baseApiUrl: string, params: IDataObject) => {
+export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequestConfig["url"] => {
 	let urlParams = '';
 	for (const [key, value] of Object.entries(params)) {
 		if (value !== undefined && value !== '') {
@@ -62,4 +64,11 @@ export const getBodyDataPlaceholder = (api: string): string => {
 	}
 
 	return bodyDataPlaceholder;
+};
+
+// this maps through the apis and match them with the endpoint -----crazy IKR🤯---
+export const apiArray: Record<string, INodePropertyOptions[]> = {
+	biographical: biographicalApiOptions,
+	employeeAddress: employeeAddressApiOptions,
+	taxProfiles: taxProfilesApiOptions,
 };

@@ -4,7 +4,7 @@
 
 ## n8n PaySpace Node
 
-This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can READ, CREATE , UPDATE or DELETE  PaySpace data in n8n system.
+This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can use this node to READ, CREATE , UPDATE or DELETE  PaySpace data in n8n system.
 
 Installation
 Install te node in your n8n server.
@@ -14,21 +14,34 @@ This node supports various PaySpace API functionalities. You can configure the n
 
 - Get Token
 - Get MetaData.
+- Get Employee
+- Get Company
+- Get Lookup Values
+- File Upload
+- Get Webhooks
+- Custom Config
 
 Note: You will need to obtain a PaySpace Authentication key and configure it in the node properties for other uses besides getting token.
 
 ## Properties
 
-- Environment: Specify the PaySpace environment (e.g., production, test).
+- Environment: Specify the PaySpace environment (e.g., production, staging).
 - Operation: Choose the desired API operation (Get token, Get Metadata, etc.).
-- Additional Fields: Depending on the operation, additional fields may be required, such as transaction amount, currency, and payment method. - - Refer to the PaySpace API documentation for specific requirements.
+- Api: Choose the desired API endpoint according to your needs.
+
+## Override Config
+
+This node uses NodeJs-Axios. If what you want to do is not working with provided API options you can override the ```Axios.config``` by selecting ```CustomConfig``` in the operation. This will give you direct control of the config. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the config schema
 
 ## Development
 
 All contributions to this node are welcome. Feel free to create pull requests for bug fixes or improvements.
 
-You can get in contact with the developer [here](https://github.com/onlypfachi)
+You can get in contact with the developer [here](https://github.com/onlypfachi/)
+[*BUY ME A COFFEE*](https://github.com)
 
 ## License
 
 This node is licensed under the MIT License. [See the LICENSE file for details](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md).
+
+<code>Developer does not work for Payspace, this is utterly made for convenience use of the powerful API! And also because I love to code😉 <code>

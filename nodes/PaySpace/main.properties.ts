@@ -65,7 +65,7 @@ export const properties: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['employee'],
+				operation: ['employee', 'company', ],
 			},
 		},
 		typeOptions: {
@@ -76,21 +76,23 @@ export const properties: INodeProperties[] = [
 			'Endpoints related to operation. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
-		displayName: 'Api Name or ID',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Api Name',
 		name: 'api',
 		type: 'options',
 		typeOptions: {
 			loadOptionsMethod: 'getApiOptions', // This method must be defined in loadOptions
-			loadOptionsDependsOn: ['endpoint'], // Depends on
+			loadOptionsDependsOn: ['operation', 'endpoint'], // Depends on
 		},
 		default: '',
 		displayOptions: {
-			show: {
-				operation: ['employee'],
-			},
+			hide: {
+				operation: ['authentication',]
+			}
 		},
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
-			'Api related to operation. Choose from the list <a href="https://developer.payspace.com/">list</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+			'Api related to operation. Choose from the <a href="https://developer.payspace.com/">, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
 		displayName:
