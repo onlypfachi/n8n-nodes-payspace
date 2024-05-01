@@ -29,6 +29,10 @@ export const operationsOptions = [
 		name: 'Webhooks',
 		value: 'webhooks',
 	},
+	{
+		name: 'Custom Config',
+		value: 'customConfig',
+	}
 ];
 
 export const scopeOptions = [
@@ -98,7 +102,8 @@ export const paramsOptions: INodeProperties[] = [
 	},
 ];
 
-export const dynamicIdDisplayArray= [ //this array contains all apis that require ID parameter
+export const dynamicIdDisplayArray = [
+	//this array contains all apis that require ID parameter
 	'getACollectionOfEmployeesAsOfAnEffectiveDate',
 	'uploadEmployeePhoto',
 	'downloadEmployeePhoto',
@@ -112,7 +117,9 @@ export const dynamicIdDisplayArray= [ //this array contains all apis that requir
 	'getASingleDependantRecord',
 	'updateASingleDependantRecord',
 	'deleteASingleDependantRecord',
-	'getASinglePositionRecord', 'createASinglePositionRecord','updateASingleEmployeeAddressRecord',
+	'getASinglePositionRecord',
+	'createASinglePositionRecord',
+	'updateASingleEmployeeAddressRecord',
 	'getASingleEmployeeRecord',
 	'createASingleEmployeeRecord',
 	'UpdateASingleEmployeeRecord',
@@ -125,8 +132,8 @@ export const dynamicIdDisplayArray= [ //this array contains all apis that requir
 	'employmentStatusReinstateSameRecord',
 ];
 
-
-export const displayBodyRaw = [ //this array contains all apis that require to be passed in raw data as json
+export const displayBodyRaw = [
+	//this array contains all apis that require to be passed in raw data as json
 	'updateASingleEmployeeAddressRecord',
 	'createASingleEmployeeRecord',
 	'employmentStatusReinstateSameRecord',
@@ -140,5 +147,16 @@ export const displayBodyRaw = [ //this array contains all apis that require to b
 	'updateASingleDependantRecord',
 	'createASingleDependantRecord',
 	'updateASingleBankDetailRecord',
+];
 
+export const displayAdditionalFields = [
+	'getASingleEmploymentStatusRecord',
+	'getASingleEmployeeRecord',
+	'getAnEmployeeAddress',
+	'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
+	'getACollectionOfEmployeesAsOfAnEffectiveDate',
+	'updateASingleEmploymentStatusRecord',
+	'getACollectionOfEmploymentStatus',
+	'getACollectionOfEmployees',
+	'getACollectionOfBankDetailRecords',
 ];

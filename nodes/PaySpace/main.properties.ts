@@ -1,5 +1,12 @@
 import { INodeProperties } from 'n8n-workflow';
-import { displayBodyRaw, dynamicIdDisplayArray, operationsOptions, paramsOptions, scopeOptions } from './options/main.options';
+import {
+	displayAdditionalFields,
+	displayBodyRaw,
+	dynamicIdDisplayArray,
+	operationsOptions,
+	paramsOptions,
+	scopeOptions,
+} from './options/main.options';
 
 export const properties: INodeProperties[] = [
 	{
@@ -37,7 +44,7 @@ export const properties: INodeProperties[] = [
 		default: 'api.full_access',
 		displayOptions: {
 			show: {
-				operation: ['getToken'],
+				operation: ['authorization'],
 			},
 		},
 	},
@@ -65,7 +72,7 @@ export const properties: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['employee', 'company', ],
+				operation: ['employee', 'company'],
 			},
 		},
 		typeOptions: {
@@ -87,19 +94,12 @@ export const properties: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			hide: {
-				operation: ['authentication',]
-			}
+				operation: ['authorization', 'getMetadata', 'customConfig'],
+			},
 		},
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
 			'Api related to operation. Choose from the <a href="https://developer.payspace.com/">, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-	},
-	{
-		displayName:
-			'This node is still in development: If any of the above options or property is not loaded please save the workflow and reopen the node',
-		name: 'notice',
-		type: 'notice',
-		default: '',
 	},
 	{
 		displayName: 'Token',
@@ -119,8 +119,8 @@ export const properties: INodeProperties[] = [
 		type: 'number',
 		default: '',
 		displayOptions: {
-			show: {
-				operation: ['getMetadata', 'employee', 'company'],
+			hide: {
+				operation: ['authorization', 'getMetadata'],
 			},
 		},
 		placeholder: 'The Company ID',
@@ -172,7 +172,8 @@ export const properties: INodeProperties[] = [
 		type: 'json',
 		default: `{ "key": "value" }`,
 		placeholder: `{"key":"value"}`,
-		description: 'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
+		description:
+			'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
 		displayOptions: {
 			show: {
 				api: displayBodyRaw,
@@ -198,17 +199,20 @@ export const properties: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				api: [
-					'getASingleEmploymentStatusRecord',
-					'getASingleEmployeeRecord',
-					'getAnEmployeeAddress',
-					'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
-					'getACollectionOfEmployeesAsOfAnEffectiveDate',
-					'updateASingleEmploymentStatusRecord',
-					'getACollectionOfEmploymentStatus',
-					'getACollectionOfEmployees',
-					'getACollectionOfBankDetailRecords',
-				],
+				api: displayAdditionalFields,
+			},
+		},
+	},
+	{
+		displayName: 'Axios Config',
+		name: 'customConfig',
+		type: 'json',
+		default: {},
+		placeholder: `\n    "method": "get",\t\t\t\t\t// Required\n    "url": "",\t\t\t\t\t\t// Required\n    "headers": {},\t\t\t\t\t\t// Required\n    "data": {},\t\t\t\t\t// Optional\n `,
+		description: 'Custom configuration',
+		displayOptions: {
+			show: {
+				operation: ['customConfig'],
 			},
 		},
 	},

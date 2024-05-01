@@ -148,7 +148,7 @@ export const leaveEndpointsCollectionOptions: INodePropertyOptions[] = [
 export const suspensionEndpointsCollectionOptions: INodePropertyOptions[] = [
 	{
 		name: 'Suspension',
-		value: 'suspension',
+		value: 'suspensionEndpoint',
 	}
 ];
 export const otherEndpointsCollectionOptions: INodePropertyOptions[] = [
@@ -224,37 +224,6 @@ export const biographicalApiOptions: INodePropertyOptions[] = [
 	{
 		name: 'Upload Employee Photo',
 		value: 'uploadEmployeePhoto',
-	},
-];
-
-export const PayslipsApiOptions: INodePropertyOptions[] = [
-	{
-		name: 'Get a Collection of Payslips',
-		value: 'getACollectionOfPayslips',
-	},
-	{
-		name: 'Get a Collection of Payslips Lines',
-		value: 'getACollectionOfPayslipsLines',
-	},
-	{
-		name: '',
-		value: '',
-	},
-	{
-		name: '',
-		value: '',
-	},
-	{
-		name: '',
-		value: '',
-	},
-	{
-		name: '',
-		value: '',
-	},
-	{
-		name: '',
-		value: '',
 	},
 ];
 

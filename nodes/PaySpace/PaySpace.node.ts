@@ -20,10 +20,19 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, notEmpty, apiArray } from './paySpace.utils';
+import { appendUrl, notEmpty, mapApiArray } from './paySpace.utils';
 import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
 import qs from 'qs';
-import { companyEndpointCollectionsOptions } from './options/company.options';
+import {
+	billingEndpointsCollectionOptions,
+	companyCustomFormsEndpointsCollectionOptions,
+	companyEndpointCollectionsOptions,
+	configurationEndpointsCollectionOptions,
+	costingProjectActivityEndpointsCollectionOptions,
+	EFTOutboxEndpointsCollectionOptions,
+	generalLedgerEndpointsCollectionOptions,
+	regionsEndpointsCollectionOptions,
+} from './options/company.options';
 import { properties } from './main.properties';
 import { lookUpValueApiOptions } from './options/lookupValues.options';
 import { webhooksApiOptions } from './options/webhooks.options';
@@ -64,7 +73,7 @@ export class PaySpace implements INodeType {
 					case 'company':
 						return companyEndpointCollectionsOptions;
 					default:
-						return []
+						return [];
 				}
 			},
 
@@ -76,13 +85,13 @@ export class PaySpace implements INodeType {
 						return basicInformationEndpointsCollectionOptions;
 					case 'payrollProcessing':
 						return payrollProcessingEndpointsCollectionOptions;
-					case 'Payroll Results':
+					case 'payrollResults':
 						return payrollResultsEndpointsCollectionOptions;
 					case 'performanceManagement':
 						return performanceManagementEndpointsCollectionOptions;
 					case 'skills':
 						return skillsEndpointsCollectionOptions;
-					case 'Suspension':
+					case 'suspension':
 						return suspensionEndpointsCollectionOptions;
 					case 'costing':
 						return costingEndpointsCollectionOptions;
@@ -90,6 +99,20 @@ export class PaySpace implements INodeType {
 						return leaveEndpointsCollectionOptions;
 					case 'other':
 						return otherEndpointsCollectionOptions;
+					case 'generalLedger':
+						return generalLedgerEndpointsCollectionOptions;
+					case 'eftOutbox':
+						return EFTOutboxEndpointsCollectionOptions;
+					case 'configuration':
+						return configurationEndpointsCollectionOptions;
+					case 'companyCustomForms':
+						return companyCustomFormsEndpointsCollectionOptions;
+					case 'billing':
+						return billingEndpointsCollectionOptions;
+					case 'costingProjectActivity':
+						return costingProjectActivityEndpointsCollectionOptions;
+					case 'regions':
+						return regionsEndpointsCollectionOptions;
 					default:
 						return [];
 				}
@@ -97,13 +120,13 @@ export class PaySpace implements INodeType {
 			async getApiOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				let operation = this.getCurrentNodeParameter('operation') as string;
 
-				if (operation === 'lookupValue') {
+				if (operation === 'lookupValues') {
 					return lookUpValueApiOptions;
-				} else if (operation === 'webhook') {
+				} else if (operation === 'webhooks') {
 					return webhooksApiOptions;
 				} else {
 					let endpoint = this.getCurrentNodeParameter('endpoint') as string;
-					return apiArray[endpoint];
+					return mapApiArray[endpoint];
 				}
 			},
 		},
@@ -491,6 +514,8 @@ export class PaySpace implements INodeType {
 							'content-type': 'application/json',
 						},
 					};
+				} else if (operation === 'customConfig'){
+					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig
 				}
 
 				const response = config; /*: AxiosResponse = await axios(config)*/

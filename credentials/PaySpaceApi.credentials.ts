@@ -4,24 +4,6 @@ export class PaySpaceApi implements ICredentialType {
 	name = 'clientCredentialApi';
 	displayName = 'Client Payspace Credential  API';
 	properties: INodeProperties[] = [
-		// {
-		// 	displayName: 'Client Environment',
-		// 	name: 'client',
-		// 	type: 'options',
-		// 	options: [
-		// 		{
-		// 			name: 'Staging',
-		// 			value: 'staging',
-		// 		},
-		// 		{
-		// 			name: 'Production',
-		// 			value: 'production',
-		// 		},
-		// 	],
-		// 	default: 'testing',
-		// 	description:
-		// 		'Are these credentials for testing or production environment?',
-		// },
 		{
 			displayName: 'Client ID',
 			name: 'client_id',

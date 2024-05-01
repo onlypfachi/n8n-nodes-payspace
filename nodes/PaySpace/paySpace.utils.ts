@@ -1,6 +1,42 @@
 import { AxiosRequestConfig } from 'axios';
 import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
-import { biographicalApiOptions, employeeAddressApiOptions, taxProfilesApiOptions } from './options/employee.options';
+import {
+	adjustmentsApiOptions,
+	applicationApiOptions,
+	assetApiOptions,
+	attachmentsApiOptions,
+	bankDetailsApiOptions,
+	biographicalApiOptions,
+	claimEmployeeWorkflowApiOptions,
+	claimsApiOptions,
+	dependantsApiOptions,
+	editPayslipApiOptions,
+	employeeAddressApiOptions,
+	employeeCustomFormsApiOptions,
+	employeeInboxApiOptions,
+	employeeQualificationsApiOptions,
+	employeeReviewHeaderApiOptions,
+	employeeReviewKPAApiOptions,
+	employeeReviewTemplateApiOptions,
+	employeeSkillsApiOptions,
+	employeeTrainingApiOptions,
+	incidentManagementApiOptions,
+	notesApiOptions,
+	outOfOfficeApiOptions,
+	payRateDetailsApiOptions,
+	payslipsApiOptions,
+	positionsApiOptions,
+	projectDetailsApiOptions,
+	recurringComponentsNestedOptions,
+	recurringCostingSplitApiOptions,
+	recurringTemplatesApiOptions,
+	setupApiOptions,
+	suspensionApiOptions,
+	takeOnYearToDateFiguresApiOptions,
+	taxCertificatesApiOptions,
+	taxProfilesApiOptions,
+} from './options/employee.options';
+import { billingEndpointsApiOptions, budgetArchiveReportApiOptions, companyCustomFormOptions, companyReviewProcessApiOptions, costingProjectActivityEndpointsApiOptions, currencyExchangeRatesApiOptions, eftOutboxApiOptions, generalLedgerApiOptions, jobManagementApiOptions, jobManagementBudgetCostApiOptions, organizationHierarchyUnitsApiOptions, organizationPositionDetailsApiOptions, regionApiOptions, regionHistoryApiOptions, trainingCourseApiOptions, workdayApiOptions } from './options/company.options';
 
 /**
  * Appends query parameters to a base URL.
@@ -11,7 +47,7 @@ import { biographicalApiOptions, employeeAddressApiOptions, taxProfilesApiOption
  *
  * Returns the base URL with the query string appended.
  */
-export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequestConfig["url"] => {
+export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequestConfig['url'] => {
 	let urlParams = '';
 	for (const [key, value] of Object.entries(params)) {
 		if (value !== undefined && value !== '') {
@@ -67,8 +103,56 @@ export const getBodyDataPlaceholder = (api: string): string => {
 };
 
 // this maps through the apis and match them with the endpoint -----crazy IKR🤯---
-export const apiArray: Record<string, INodePropertyOptions[]> = {
+export const mapApiArray: Record<string, INodePropertyOptions[]> = {
 	biographical: biographicalApiOptions,
 	employeeAddress: employeeAddressApiOptions,
 	taxProfiles: taxProfilesApiOptions,
+	projectDetails: projectDetailsApiOptions,
+	positions: positionsApiOptions,
+	incidentManagement: incidentManagementApiOptions,
+	employeeInbox: employeeInboxApiOptions,
+	employeeCustomForms: employeeCustomFormsApiOptions,
+	dependants: dependantsApiOptions,
+	assets: assetApiOptions,
+	attachments: attachmentsApiOptions,
+	bankDetails: bankDetailsApiOptions,
+	payRateDetails: payRateDetailsApiOptions,
+	recurringComponents: recurringComponentsNestedOptions, // TODO: check
+	takeOnYearToDateFigures: takeOnYearToDateFiguresApiOptions,
+	recurringTemplates: recurringTemplatesApiOptions,
+	claims: claimsApiOptions,
+	claimEmployeeWorkflow: claimEmployeeWorkflowApiOptions,
+	payslip: payslipsApiOptions,
+	editPayslip: editPayslipApiOptions,
+	taxCertificates: taxCertificatesApiOptions,
+	adjustments: adjustmentsApiOptions,
+	setup: setupApiOptions,
+	application: applicationApiOptions,
+	suspensionEndpoint: suspensionApiOptions,
+	outOfOffice: outOfOfficeApiOptions,
+	notes: notesApiOptions,
+	employeeTraining: employeeTrainingApiOptions,
+	employeeQualifications: employeeQualificationsApiOptions,
+	employeeSkills: employeeSkillsApiOptions,
+	recurringCostingSplit: recurringCostingSplitApiOptions,
+	employeeReviewHeader: employeeReviewHeaderApiOptions,
+	employeeReviewKPA: employeeReviewKPAApiOptions,
+	employeeReviewTemplate: employeeReviewTemplateApiOptions,
+	//conmpany: concmpanyApiOptions
+	generalLedger: generalLedgerApiOptions,
+	eftOutbox: eftOutboxApiOptions,
+	organizationPositionDetails: organizationPositionDetailsApiOptions,
+	organizationHierarchyUnits: organizationHierarchyUnitsApiOptions,
+	jobManagement: jobManagementApiOptions,
+	jobManagementBudgetCost: jobManagementBudgetCostApiOptions,
+	budgetArchiveReport: budgetArchiveReportApiOptions,
+	currencyExchangeRates: currencyExchangeRatesApiOptions,
+	workday: workdayApiOptions,
+	trainingCourse: trainingCourseApiOptions,
+	companyReviewProcess: companyReviewProcessApiOptions,
+	companyCustomFormOptions: companyCustomFormOptions,
+	billingEndpoints: billingEndpointsApiOptions,
+	costingProjectActivityEndpoints: costingProjectActivityEndpointsApiOptions, // TODO: check
+	region: regionApiOptions,
+	regionHistory: regionHistoryApiOptions,
 };
