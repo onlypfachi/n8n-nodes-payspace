@@ -207,7 +207,7 @@ export const properties: INodeProperties[] = [
 		displayName: 'Axios Config',
 		name: 'customConfig',
 		type: 'json',
-		default: {},
+		default: `{ "key": "value" }`,
 		placeholder: `\n    "method": "get",\t\t\t\t\t// Required\n    "url": "",\t\t\t\t\t\t// Required\n    "headers": {},\t\t\t\t\t\t// Required\n    "data": {},\t\t\t\t\t// Optional\n `,
 		description: 'Custom configuration',
 		displayOptions: {
