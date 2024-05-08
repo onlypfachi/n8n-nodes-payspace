@@ -7,6 +7,7 @@ import {
 	paramsOptions,
 	scopeOptions,
 } from './options/main.options';
+import { requestData } from './paySpace.utils';
 
 export const properties: INodeProperties[] = [
 	{
@@ -47,6 +48,18 @@ export const properties: INodeProperties[] = [
 				operation: ['authorization'],
 			},
 		},
+	},
+	{
+		displayName: 'Company ID',
+		name: 'companyId',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			hide: {
+				operation: ['authorization', 'customConfig'],
+			},
+		},
+		placeholder: 'The Company ID',
 	},
 	{
 		displayName: 'Endpoint Collection Name or ID',
@@ -113,19 +126,6 @@ export const properties: INodeProperties[] = [
 		},
 		description: 'The Authorization bearer token type',
 	},
-	{
-		displayName: 'Company ID',
-		name: 'companyId',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			hide: {
-				operation: ['authorization', 'getMetadata'],
-			},
-		},
-		placeholder: 'The Company ID',
-	},
-
 	{
 		displayName: 'Effective Date',
 		name: 'effectiveDate',
@@ -207,8 +207,8 @@ export const properties: INodeProperties[] = [
 		displayName: 'Axios Config',
 		name: 'customConfig',
 		type: 'json',
-		default: `\n    "method": "get",\t\t\t\t\t// Required\n    "url": "",\t\t\t\t\t\t// Required\n    "headers": {},\t\t\t\t\t\t// Required\n    "data": {},\t\t\t\t\t// Optional\n `,
-		placeholder: `\n    "method": "get",\t\t\t\t\t// Required\n    "url": "",\t\t\t\t\t\t// Required\n    "headers": {},\t\t\t\t\t\t// Required\n    "data": {},\t\t\t\t\t// Optional\n `,
+		default: `${requestData}`,
+		placeholder: `${requestData}`,
 		description: 'Custom configuration',
 		displayOptions: {
 			show: {

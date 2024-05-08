@@ -36,7 +36,24 @@ import {
 	taxCertificatesApiOptions,
 	taxProfilesApiOptions,
 } from './options/employee.options';
-import { billingEndpointsApiOptions, budgetArchiveReportApiOptions, companyCustomFormOptions, companyReviewProcessApiOptions, costingProjectActivityEndpointsApiOptions, currencyExchangeRatesApiOptions, eftOutboxApiOptions, generalLedgerApiOptions, jobManagementApiOptions, jobManagementBudgetCostApiOptions, organizationHierarchyUnitsApiOptions, organizationPositionDetailsApiOptions, regionApiOptions, regionHistoryApiOptions, trainingCourseApiOptions, workdayApiOptions } from './options/company.options';
+import {
+	billingEndpointsApiOptions,
+	budgetArchiveReportApiOptions,
+	companyCustomFormOptions,
+	companyReviewProcessApiOptions,
+	costingProjectActivityEndpointsApiOptions,
+	currencyExchangeRatesApiOptions,
+	eftOutboxApiOptions,
+	generalLedgerApiOptions,
+	jobManagementApiOptions,
+	jobManagementBudgetCostApiOptions,
+	organizationHierarchyUnitsApiOptions,
+	organizationPositionDetailsApiOptions,
+	regionApiOptions,
+	regionHistoryApiOptions,
+	trainingCourseApiOptions,
+	workdayApiOptions,
+} from './options/company.options';
 
 /**
  * Appends query parameters to a base URL.
@@ -86,13 +103,13 @@ export const getBodyDataPlaceholder = (api: string): string => {
 				'"EmploymentAction": "reinstate this employee resuming this tax record" //Required';
 			break;
 		case 'employmentStatusEmployeeTermination':
-			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t// Required\n    "TerminationReason": "string",\t\t\t\t\t\t// Required\n    "EmploymentAction": "string",\t\t\t\t\t\t// Required\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t// Required\n`;
+			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t\n    "TerminationReason": "string",\t\t\t\t\t\t\n    "EmploymentAction": "string",\t\t\t\t\t\t\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t\n`;
 			break;
 		case 'employmentStatusReinstateWithNewTaxRecord':
 			bodyDataPlaceholder = `\n    "EmploymentAction": "reinstate this employee starting a new tax record",\t//Required\n\t"EmploymentDate": "2019-01-01"\t\t\t\t\t\t\t\t\t\t\t\t//Required\n}`;
 			break;
 		case 'employmentStatusEmployeeTermination':
-			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t// Required\n    "TerminationReason": "string",\t\t\t\t\t\t// Required\n    "EmploymentAction": "string",\t\t\t\t\t\t// Required\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t// Required\n`;
+			bodyDataPlaceholder = `\n    "TerminationDate": "2019-01-01",\t\t\t\t\t\n    "TerminationReason": "string",\t\t\t\t\t\t\n    "EmploymentAction": "string",\t\t\t\t\t\t\n    "TerminationCompanyRun": "string",\t\t\t\t\t// Optional\n    "EncashLeave": true \t\t\t\t\t\t\t\t\n`;
 			break;
 		default:
 			bodyDataPlaceholder = 'no preview body';
@@ -155,4 +172,15 @@ export const mapApiArray: Record<string, INodePropertyOptions[]> = {
 	costingProjectActivityEndpoints: costingProjectActivityEndpointsApiOptions, // TODO: check
 	region: regionApiOptions,
 	regionHistory: regionHistoryApiOptions,
+};
+
+export const requestData = {
+	method: 'get',
+	maxBodyLength: Infinity,
+	url: 'https://api.payspace.com/odata/v1.1/',
+	headers: {
+		Authorization: 'Bearer {{payspace-access-token}}',
+		Content: 'application/json',
+	},
+	data: {}
 };

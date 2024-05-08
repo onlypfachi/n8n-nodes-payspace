@@ -152,7 +152,7 @@ export class PaySpace implements INodeType {
 						: 'https://identity.yourhcm.com/connect/token';
 
 				let config: AxiosRequestConfig = {};
-				let companyId;
+				let companyId: string | number;
 				let paySpaceAccessToken;
 				let additionalFields;
 				// const getMetadataResponse = {
@@ -187,7 +187,7 @@ export class PaySpace implements INodeType {
 
 					config = {
 						method: 'get',
-						url: apiUrl + '/odata/v1.1/' + companyId + '/$metadata',
+						url: `${apiUrl}${companyId}/$metadata`,
 						headers: {
 							Authorization: paySpaceAccessToken,
 						},
