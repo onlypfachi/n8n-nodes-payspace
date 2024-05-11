@@ -97,7 +97,7 @@ export const properties: INodeProperties[] = [
 	},
 	{
 		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
-		displayName: 'Api Name',
+		displayName: 'Api Request',
 		name: 'api',
 		type: 'options',
 		typeOptions: {
@@ -167,11 +167,10 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Body (Raw)',
+		displayName: 'Body (Raw)', // TODO: it work fine but confirm in config
 		name: 'bodyData',
 		type: 'json',
-		default: `{ "key": "value" }`,
-		placeholder: `{"key":"value"}`,
+		default: '',
 		description:
 			'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
 		displayOptions: {
@@ -181,7 +180,7 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'PARAMS',
+		displayName: 'Optional PARAMS',
 		name: 'additionalFields',
 		placeholder: 'Additional optional params',
 		type: 'fixedCollection',
@@ -215,5 +214,11 @@ export const properties: INodeProperties[] = [
 				operation: ['customConfig'],
 			},
 		},
+	},
+	{
+		displayName: 'This node is still in beta',
+		name: 'notice',
+		type: 'notice',
+		default: '',
 	},
 ];

@@ -153,8 +153,8 @@ export class PaySpace implements INodeType {
 
 				let config: AxiosRequestConfig = {};
 				let companyId: string | number;
-				let paySpaceAccessToken;
-				let additionalFields;
+				let paySpaceAccessToken: string;
+				let additionalFields: IDataObject;
 				// const getMetadataResponse = {
 				// 	json: {
 				// 		success: true,
@@ -193,6 +193,8 @@ export class PaySpace implements INodeType {
 						},
 					};
 				} else if (operation === 'employee') {
+					companyId = this.getNodeParameter('companyId', i) as any;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 					config = {
 						maxBodyLength: Infinity,
 						headers: {
@@ -201,8 +203,7 @@ export class PaySpace implements INodeType {
 						},
 					};
 					const api = this.getNodeParameter('api', i) as string;
-					companyId = this.getNodeParameter('companyId', i) as any;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+
 					let baseURL: string;
 
 					let employeeId;
@@ -217,47 +218,47 @@ export class PaySpace implements INodeType {
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
 					) {
 						case 'getACollectionOfEmployees':
-							baseURL = apiUrl + '/odata/v1.1/' + companyId + '/Employee?';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
-								: baseURL;
+							baseURL = `${apiUrl}${companyId}/Employee?`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 							config.method = 'get';
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
 							break;
 						case 'getACollectionOfEmployeesAsOfAnEffectiveDate':
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
 							additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee/effective/${effectiveDate}?`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
-								: baseURL;
+							baseURL = `${apiUrl}${companyId}/Employee/effective/${effectiveDate}?`;
 							config.method = 'get';
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
 							break;
 						case 'getASingleEmployeeRecord':
-							employeeId = this.getNodeParameter('employeeId', i) as string;
+							employeeId = this.getNodeParameter('Id', i) as string;
 							config.method = 'get';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
+							config.url = `${apiUrl}${companyId}/Employee(${employeeId})`;
 							break;
 						case 'createASingleEmployeeRecord':
 							data = this.getNodeParameter('bodyData', i) as IDataObject;
-							employeeId = this.getNodeParameter('employeeId', i) as string;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
+							employeeId = this.getNodeParameter('Id', i) as string;
+							baseURL = `${apiUrl}${companyId}/Employee(${employeeId})`;
 							config.method = 'patch';
 							config.data = data;
 
 							break;
 						case 'UpdateASingleEmployeeRecord':
 							data = this.getNodeParameter('bodyData', i) as IDataObject;
-							employeeId = this.getNodeParameter('employeeId', i) as any;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee(${employeeId})`;
+							employeeId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/Employee(${employeeId})`;
 							config.method = 'patch';
 							config.data = data;
 
 							break;
-						case 'downloadEmployeePhoto':
+						case 'downloadEmployeePhoto': //TODO: Implement upload logic
 							const FormDataDownload = require('form-data');
 							employeeId = this.getNodeParameter('employeeId', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/Employee/${employeeId}/image/download`;
+							config.url = `${apiUrl}${companyId}/Employee/${employeeId}/image/download`;
 							data = new FormDataDownload();
 							config.data = data;
 							config.method = 'get';
@@ -269,7 +270,7 @@ export class PaySpace implements INodeType {
 						case 'uploadEmployeePhoto': //TODO: Implement upload logic
 							const FormDataUpload = require('form-data');
 							employeeId = this.getNodeParameter('employeeId', i) as string;
-							const baseURLUpload = `${apiUrl}/odata/v1.1/${companyId}/Employee/${employeeId}/image/upload`;
+							const baseURLUpload = `${apiUrl}${companyId}/Employee/${employeeId}/image/upload`;
 							data = new FormDataUpload();
 							config.url = baseURLUpload;
 							config.method = 'post';
@@ -283,17 +284,18 @@ export class PaySpace implements INodeType {
 							const EmployeeNumber = this.getNodeParameter('employeeNumber', i) as string;
 							config.method = 'get';
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress/${EmployeeNumber}`;
+							baseURL = `${apiUrl}${companyId}/EmployeeAddress/${EmployeeNumber}`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 
 							break;
 						case 'updateASingleEmployeeAddressRecord':
 							const addressId = this.getNodeParameter('addressId', i) as string;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeAddress(${addressId})`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeAddress(${addressId})`;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject; //see "EmployeeAddress" in metadata endpoint for available fields
-							config.url = appendUrl(baseURL, additionalFields);
+							config.url = appendUrl(baseURL, additionalFields.params as IDataObject);
 							config.method = 'patch';
 							config.headers = {
 								'Content-Type': 'application/json',
@@ -301,15 +303,15 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfEmploymentStatus':
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus?`;
+							baseURL = `${apiUrl}${companyId}/EmployeeEmploymentStatus?`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							config.method = 'get';
 							break;
 						case 'getASingleEmploymentStatusRecord':
 							statusId = this.getNodeParameter('statusId', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`; //
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`; //
 							config.method = 'get';
 
 							break;
@@ -318,79 +320,79 @@ export class PaySpace implements INodeType {
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							config.url = notEmpty(additionalFields)
 								? appendUrl(
-										`${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`,
+										`${apiUrl}${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`,
 										additionalFields,
 								  )
-								: `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`; //
+								: `${apiUrl}${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`; //
 							config.method = 'get';
 
 							break;
 						case 'getACollectionOfAllEmploymentStatuses':
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus/all`;
+							baseURL = `${apiUrl}${companyId}/EmployeeEmploymentStatus/all`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL; //
 							config.method = 'get';
 
 							break;
 						case 'createASingleEmploymentStatusRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus`;
 							config.method = 'post';
 
 							break;
 						case 'updateASingleEmploymentStatusRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							statusId = this.getNodeParameter('statusId', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
 							break;
 						case 'employmentStatusEmployeeTermination':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							statusId = this.getNodeParameter('statusId', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
 							break;
 						case 'employmentStatusReinstateSameRecord':
 							statusId = this.getNodeParameter('statusId', i) as string;
 							config.method = 'patch';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							break;
 						case 'employmentStatusReinstateWithNewTaxRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
 							statusId = this.getNodeParameter('statusId', i) as string;
 							config.method = 'patch';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 
 							break;
 						case 'deleteASingleEmploymentStatusRecord':
 							config.method = 'delete';
 							statusId = this.getNodeParameter('statusId', i) as string;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeEmploymentStatus(${statusId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 
 							break;
 						case 'getACollectionOfPositions': //Position
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition`;
+							baseURL = `${apiUrl}${companyId}/EmployeePosition`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							config.method = 'get';
 							break;
 						case 'getASinglePositionRecord':
 							positionId = this.getNodeParameter('positionId', i) as any;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'get';
 							break;
 						case 'getACollectionOfPositionsAsOfAnEffectiveDate':
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
 							config.method = 'get';
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition/effective/${effectiveDate}`;
+							baseURL = `${apiUrl}${companyId}/EmployeePosition/effective/${effectiveDate}`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							config.headers = {
 								Authorization: paySpaceAccessToken,
@@ -399,58 +401,58 @@ export class PaySpace implements INodeType {
 						case 'createASinglePositionRecord':
 							positionId = this.getNodeParameter('positionId', i) as any;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'post';
 							break;
 						case 'updateASinglePositionRecord':
 							positionId = this.getNodeParameter('positionId', i) as any;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'patch';
 							break;
 						case 'deleteASinglePositionRecord':
 							positionId = this.getNodeParameter('positionId', i) as string;
 							config.method = 'delete';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeePosition(${positionId})`;
+							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							break;
 						case 'getACollectionOfBankDetailRecords': //Bank Details
-							baseURL = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail?`;
+							baseURL = `${apiUrl}${companyId}/EmployeeBankDetail?`;
 							config.method = 'get';
 							additionalFields = additionalFields = this.getNodeParameter(
 								'additionalFields',
 								i,
 							) as any;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleBankDetailRecord':
 							bankDetailId = this.getNodeParameter('bankDetailId', i) as any;
 							config.method = 'get';
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							break;
 						case 'createASingleBankDetailRecord':
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail`;
+							config.url = `${apiUrl}${companyId}/EmployeeBankDetail`;
 							config.method = 'post';
 							break;
 						case 'updateASingleBankDetailRecord':
 							bankDetailId = this.getNodeParameter('Id', i) as any;
 							config.data = this.getNodeParameter('bodyData', i) as IDataObject;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							config.method = 'patch';
 							break;
 						case 'deleteASingleBankDetailRecord':
 							config.method = 'delete';
 							bankDetailId = this.getNodeParameter('Id', i) as any;
-							config.url = `${apiUrl}/odata/v1.1/${companyId}/EmployeeBankDetail(${bankDetailId})`;
+							config.url = `${apiUrl}${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							break;
 						case 'getACollectionOfDependants': //Dependants
 							config.method = 'get';
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeDependant`;
 							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleDependantRecord':
@@ -486,7 +488,11 @@ export class PaySpace implements INodeType {
 							break;
 					}
 				} else if (operation === 'company') {
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 				} else if (operation === 'lookUpValue') {
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 					let lookUpValueApi = this.getNodeParameter('api', i) as string;
 					additionalFields = this.getNodeParameter('additionalFields', i) as any;
 					config = {
@@ -499,7 +505,27 @@ export class PaySpace implements INodeType {
 						},
 					};
 				} else if (operation === 'fileUpload') {
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+
+					config = {
+						method: 'get',
+						url: `${apiUrl}${companyId}/$metadata`,
+						headers: {
+							Authorization: paySpaceAccessToken,
+						},
+					};
 				} else if (operation === 'webhooks') {
+					companyId = this.getNodeParameter('companyId', i) as number;
+					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+
+					config = {
+						method: 'get',
+						url: `${apiUrl}${companyId}/$metadata`,
+						headers: {
+							Authorization: paySpaceAccessToken,
+						},
+					};
 					const entityType = this.getNodeParameter('entityType', i) as string;
 					const fromDate = this.getNodeParameter('fromDate', i) as string;
 					const toDate = this.getNodeParameter('toDate', i) as string;
@@ -514,12 +540,12 @@ export class PaySpace implements INodeType {
 							'content-type': 'application/json',
 						},
 					};
-				} else if (operation === 'customConfig'){
-					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig
+				} else if (operation === 'customConfig') {
+					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig;
 				}
 
 				const response = config; /*: AxiosResponse = await axios(config)*/
-				responseData = [{ response }];
+				responseData = [{ config }];
 				// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(

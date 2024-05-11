@@ -32,7 +32,7 @@ export const operationsOptions = [
 	{
 		name: 'Custom Config',
 		value: 'customConfig',
-	}
+	},
 ];
 
 export const scopeOptions = [
@@ -96,8 +96,8 @@ export const paramsOptions: INodeProperties[] = [
 		displayName: 'Filter',
 		name: 'filter',
 		type: 'string',
-		description:
-			'Filter by field eg. "EmployeeNumber eq Emp01". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-unneeded-backticks
+		description: `Filter by field eg. "EmployeeNumber eq 'Emp01'". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris`,
 		default: '',
 	},
 ];
@@ -151,11 +151,9 @@ export const displayBodyRaw = [
 
 export const displayAdditionalFields = [
 	'getASingleEmploymentStatusRecord',
-	'getASingleEmployeeRecord',
 	'getAnEmployeeAddress',
 	'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate',
 	'getACollectionOfEmployeesAsOfAnEffectiveDate',
-	'updateASingleEmploymentStatusRecord',
 	'getACollectionOfEmploymentStatus',
 	'getACollectionOfEmployees',
 	'getACollectionOfBankDetailRecords',
