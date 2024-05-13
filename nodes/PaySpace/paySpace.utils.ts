@@ -180,7 +180,7 @@ export const requestData = {
 	url: 'https://api.payspace.com/odata/v1.1/',
 	headers: {
 		Authorization: 'Bearer {{payspace-access-token}}',
-		Content: 'application/json',
+		'content-type': 'application/json',
 	},
-	data: {}
+	data: {},
 };
