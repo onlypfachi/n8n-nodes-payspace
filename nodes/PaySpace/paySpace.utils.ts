@@ -184,3 +184,12 @@ export const requestData = {
 	},
 	data: {},
 };
+
+export const extractData = (data: { assignments: { name: string, value: string }[] }): Record<string, string> => {
+  const result: Record<string, string> = {};
+  data.assignments.forEach((assignment) => {
+    result[assignment.name] = assignment.value;
+  });
+  return result;
+};
+

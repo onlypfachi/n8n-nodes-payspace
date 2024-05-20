@@ -407,49 +407,49 @@ export const projectDetailsApiOptions = [
 export const assetApiOptions = [
 	{
 		name: 'Get Collection',
-		value: 'getCollection',
+		value: 'getCollectionOfAssets',
 	},
 	{
 		name: 'Get Single Record',
-		value: 'getSingleRecord',
+		value: 'getSingleAssetRecord',
 	},
 	{
 		name: 'Create Record',
-		value: 'createRecord',
+		value: 'createSingleAssetRecord',
 	},
 	{
 		name: 'Update Single Record',
-		value: 'updateSingleRecord',
+		value: 'updateSingleAssetRecord',
 	},
 	{
 		name: 'Delete Single Record',
-		value: 'deleteSingleRecord',
+		value: 'deleteSingleAssetRecord',
 	},
 ];
 export const employeeCustomFormsApiOptions = [
 	{
 		name: 'Get Collection',
-		value: 'getCollection',
+		value: 'getCollectionOfCustomForms',
 	},
 	{
 		name: 'Get Collection by Category',
-		value: 'getCollectionByCategory',
+		value: 'getCollectionOfCustomFormsByCategory',
 	},
 	{
 		name: 'Get Single',
-		value: 'getSingle',
+		value: 'getSingleCustomForm',
 	},
 	{
 		name: 'Post',
-		value: 'post',
+		value: 'postSingleCustomForm',
 	},
 	{
 		name: 'PATCH',
-		value: 'patch',
+		value: 'patchSingleCustomForm',
 	},
 	{
 		name: 'Delete',
-		value: 'delete',
+		value: 'deleteSingleCustomForm',
 	},
 ];
 export const employeeInboxApiOptions = [

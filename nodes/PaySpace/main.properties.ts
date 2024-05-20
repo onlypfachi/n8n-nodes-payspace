@@ -158,8 +158,9 @@ export const properties: INodeProperties[] = [
 		displayName: 'ID',
 		name: 'Id',
 		type: 'string',
+		hint: "Id could be 'EmployeeId' or 'EmployeePositionId' depend on the api",
 		default: '',
-		description: 'Enter the EmployeePositionId',
+		description: 'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
 		displayOptions: {
 			show: {
 				api: dynamicIdDisplayArray,
@@ -167,17 +168,29 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Body (Raw)', // TODO: it work fine but confirm in config
-		name: 'bodyData',
-		type: 'json',
+		displayName: 'Category',
+		name: 'category',
+		type: 'string',
 		default: '',
-		description:
-			'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
+		description: 'Enter the CATEGORY',
 		displayOptions: {
 			show: {
-				api: displayBodyRaw,
+				api: ['getCollectionOfCustomFormsByCategory'],
 			},
 		},
+	},
+	{
+		displayName: 'Body (Raw)',
+		name: 'assignments',
+		type: 'assignmentCollection',
+		default: {},
+		description:
+		'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
+	displayOptions: {
+		show: {
+			api: displayBodyRaw,
+		},
+	},
 	},
 	{
 		displayName: 'Optional PARAMS',
