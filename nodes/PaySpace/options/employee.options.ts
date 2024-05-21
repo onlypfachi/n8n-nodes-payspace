@@ -455,29 +455,29 @@ export const employeeCustomFormsApiOptions = [
 export const employeeInboxApiOptions = [
 	{
 		name: 'Get Collection',
-		value: 'getCollection',
+		value: 'getCollectionOfEmployeeInbox',
 	},
 ];
 export const incidentManagementApiOptions = [
 	{
 		name: 'Get a Collection',
-		value: 'getACollection',
+		value: 'getACollectionOfIncidentManagement',
 	},
 	{
 		name: 'Get Single',
-		value: 'getSingle',
+		value: 'getSingleIncidentManagement',
 	},
 	{
 		name: 'Create Record',
-		value: 'createRecord',
+		value: 'createSingleIncidentManagement',
 	},
 	{
 		name: 'Update Single Record',
-		value: 'updateSingleRecord',
+		value: 'patchSingleIncidentManagement',
 	},
 	{
 		name: 'Delete Single Record',
-		value: 'deleteSingleRecord',
+		value: 'deleteSingleIncidentManagement',
 	},
 ];
 export const payRateDetailsApiOptions = [
@@ -577,7 +577,7 @@ export const takeOnYearToDateFiguresApiOptions = [
 	},
 	{
 		name: 'Get a Single Take on Record',
-		value: 'getACollectionOfTakeOnRecord',
+		value: 'getASingleOfTakeOnRecord',
 	},
 	{
 		name: 'Create a Single Take on Record',

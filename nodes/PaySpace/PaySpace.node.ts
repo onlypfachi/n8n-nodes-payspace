@@ -201,7 +201,6 @@ export class PaySpace implements INodeType {
 							Authorization: paySpaceAccessToken,
 							'Content-Type': 'application/json',
 						},
-
 					};
 					const api = this.getNodeParameter('api', i) as string;
 
@@ -218,6 +217,11 @@ export class PaySpace implements INodeType {
 					let employeeProjectId;
 					let employeeAssetId;
 					let employeeCustomFormId;
+					let IncidentId;
+					let payrateId;
+					let takeOnId;
+					let claimId;
+					let claimBatchId;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
@@ -587,12 +591,12 @@ export class PaySpace implements INodeType {
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							break;
-							case 'getCollectionOfCustomFormsByCategory':
-								const category = this.getNodeParameter('category', i) as any;
-								config.method = 'get';
-								additionalFields = this.getNodeParameter('additionalFields', i) as any;
-								baseURL = `${apiUrl}${companyId}/EmployeeCustomForm?category=${category}`;
-								config.url = notEmpty(additionalFields)
+						case 'getCollectionOfCustomFormsByCategory':
+							const category = this.getNodeParameter('category', i) as any;
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeCustomForm?category=${category}`;
+							config.url = notEmpty(additionalFields)
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 						case 'getSingleCustomForm':
@@ -600,23 +604,181 @@ export class PaySpace implements INodeType {
 							employeeCustomFormId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
 							break;
-							case 'postSingleCustomForm':
-								config.method = 'post';
-								config.data = extractData(this.getNodeParameter('assignments', i) as any);
-								config.url = `${apiUrl}${companyId}/EmployeeCustomForm`;
+						case 'postSingleCustomForm':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeCustomForm`;
+							break;
+						case 'patchSingleCustomForm':
+							config.method = 'patch';
+							employeeCustomFormId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+						case 'deleteSingleCustomForm':
+							config.method = 'delete';
+							employeeCustomFormId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
+							break;
+						case 'getCollectionOfEmployeeInbox':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeInbox`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getACollectionOfIncidentManagement':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeIncident`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getSingleIncidentManagement':
+							config.method = 'get';
+							IncidentId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}EmployeeIncident(${IncidentId})`;
+							break;
+						case 'createSingleIncidentManagement':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}EmployeeIncident`;
+							break;
+						case 'patchSingleIncidentManagement':
+							config.method = 'patch';
+							IncidentId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}EmployeeIncident(${IncidentId})`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+						case 'deleteSingleIncidentManagement':
+							config.method = 'delete';
+							IncidentId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}EmployeeIncident(${IncidentId})`;
+							break;
+						case 'getACollectionOfPayRates':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeePayRate`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getASinglePayRateRecord':
+							config.method = 'get';
+							payrateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							break;
+						case 'getACollectionOfPayRatesAsOfAnEffectiveDate':
+							config.method = 'get';
+							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeePayRate?effectiveDate=${effectiveDate}`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'createASinglePayRateRecord':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeePayRate`;
+							break;
+						case 'updateASinglePayRateRecord':
+							config.method = 'patch';
+							payrateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+						case 'deleteASinglePayRateRecord':
+							config.method = 'delete';
+							payrateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							break;
+						case 'getACollectionOfTakeOnRecords':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeTakeOn`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getASingleOfTakeOnRecord':
+							config.method = 'get';
+							takeOnId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeTakeOn(${takeOnId})`;
+							break;
+						case 'createACollectionOfTakeOnRecord':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeTakeOn`;
+							break;
+						case 'updateASingleOfTakeOnRecord':
+							config.method = 'patch';
+							takeOnId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeTakeOn(${takeOnId})`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+						case 'addASingleRecurringTemplateToAnEmployee':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeRecurringTemplate`;
+							break;
+						case 'getACollectionOfClaims':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeClaim`;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getASingleEmployeeClaimRecord':
+							config.method = 'get';
+							claimId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeClaim(${claimId})`;
+							break;
+						case 'createASingleEmployeeClaimRecord':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeClaim`;
+							break;
+						case 'uploadClaimAttachment': // TODO: fix: handle file upload
+							config.method = 'post';
+							claimId = this.getNodeParameter('Id', i) as any;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeClaim/${claimId}/attachment/upload`;
+							config.headers = {
+								Authorization: paySpaceAccessToken,
+								'Content-Type': 'application/json',
+								...data.getHeaders(),
+							};
+							break;
+						case 'updateASingleEmployeeClaimRecord':
+							config.method = 'patch';
+							claimId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeClaim(${claimId})`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+						case 'deleteASingleEmployeeClaimRecord':
+							config.method = 'delete';
+							claimId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeClaim(${claimId})`;
+							break;
+						case 'submitEmployeeClaimBatchForWorkflow':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.url = `${apiUrl}${companyId}/EmployeeClaim/${claimBatchId}/submit`;
+							break;
+							case 'getASingleEmployeeWorkflowRecord':
+								config.method = 'get';
+								workflowId = this.getNodeParameter('Id', i) as any;
+								config.url = `${apiUrl}${companyId}/EmployeeWorkflow/claim/${UserWorkflowStepId}/${ClaimBatchId}`;
 								break;
-								case 'patchSingleCustomForm':
-									config.method = 'patch';
-									employeeCustomFormId = this.getNodeParameter('Id', i) as any;
-									config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
+								case 'submitWorkflowStep':
+									config.method = 'post';
 									config.data = extractData(this.getNodeParameter('assignments', i) as any);
+									config.url = `${apiUrl}${companyId}/EmployeeWorkflow/${workflowId}/submit`;
 									break;
-									case 'deleteSingleCustomForm':
-										config.method = 'delete';
-										employeeCustomFormId = this.getNodeParameter('Id', i) as any;
-										config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
-										break;
-
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
 							throw new Error('Invalid Operation');
