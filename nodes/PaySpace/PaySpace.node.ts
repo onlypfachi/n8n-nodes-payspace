@@ -222,6 +222,7 @@ export class PaySpace implements INodeType {
 					let takeOnId;
 					let claimId;
 					let claimBatchId;
+					let UserWorkflowStepId;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
@@ -766,19 +767,55 @@ export class PaySpace implements INodeType {
 							break;
 						case 'submitEmployeeClaimBatchForWorkflow':
 							config.method = 'post';
+							claimBatchId = this.getNodeParameter('Id', i) as any;
 							config.data = extractData(this.getNodeParameter('assignments', i) as any);
 							config.url = `${apiUrl}${companyId}/EmployeeClaim/${claimBatchId}/submit`;
 							break;
-							case 'getASingleEmployeeWorkflowRecord':
-								config.method = 'get';
-								workflowId = this.getNodeParameter('Id', i) as any;
-								config.url = `${apiUrl}${companyId}/EmployeeWorkflow/claim/${UserWorkflowStepId}/${ClaimBatchId}`;
-								break;
-								case 'submitWorkflowStep':
-									config.method = 'post';
-									config.data = extractData(this.getNodeParameter('assignments', i) as any);
-									config.url = `${apiUrl}${companyId}/EmployeeWorkflow/${workflowId}/submit`;
-									break;
+						case 'getASingleEmployeeWorkflowRecord':
+							config.method = 'get';
+							claimBatchId = this.getNodeParameter('Id', i) as any;
+							UserWorkflowStepId = this.getNodeParameter('UserWorkflowStepId', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeWorkflow/claim/${UserWorkflowStepId}/${claimBatchId}`;
+							break;
+						case 'submitWorkflowStep':
+							config.method = 'post';
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							UserWorkflowStepId = this.getNodeParameter('UserWorkflowStepId', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeeWorkflow/${UserWorkflowStepId}/submit`;
+							break;
+						case 'getACollectionOfPayslips':
+							config.method = 'get';
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}`; //TODO: get the year and month
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getACollectionOfPayslipsLines':
+							config.method = 'get';
+							baseURL= `${apiUrl}${companyId}/EmployeePayslipLine/${year}/${month}`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getACollectionOfCostedPayslipsLines':
+							config.method = 'get';
+							baseURL= `${apiUrl}${companyId}/EmployeeCostedPayslipLine/${year}/${month}`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+						case 'getACollectionOfConsolidatedPayslips':
+							config.method = 'get';
+							baseURL= `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/consolidated`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
+							break;
+
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
 							throw new Error('Invalid Operation');

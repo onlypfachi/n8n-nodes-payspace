@@ -168,6 +168,19 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'UserWorkflowStepId',
+		name: 'UserWorkflowStepId',
+		type: 'string',
+		hint: "workflowId",
+		default: '',
+		description: 'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
+		displayOptions: {
+			show: {
+				api: ["getASingleEmployeeWorkflowRecord", "submitWorkflowStep"],
+			},
+		},
+	},
+	{
 		displayName: 'Category',
 		name: 'category',
 		type: 'string',
