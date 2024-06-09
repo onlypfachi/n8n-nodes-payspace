@@ -160,7 +160,8 @@ export const properties: INodeProperties[] = [
 		type: 'string',
 		hint: "Id could be 'EmployeeId' or 'EmployeePositionId' depend on the api",
 		default: '',
-		description: 'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
+		description:
+			'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
 		displayOptions: {
 			show: {
 				api: dynamicIdDisplayArray,
@@ -171,12 +172,13 @@ export const properties: INodeProperties[] = [
 		displayName: 'UserWorkflowStepId',
 		name: 'UserWorkflowStepId',
 		type: 'string',
-		hint: "workflowId",
+		hint: 'workflowId',
 		default: '',
-		description: 'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
+		description:
+			'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
 		displayOptions: {
 			show: {
-				api: ["getASingleEmployeeWorkflowRecord", "submitWorkflowStep"],
+				api: ['getASingleEmployeeWorkflowRecord', 'submitWorkflowStep'],
 			},
 		},
 	},
@@ -193,17 +195,41 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Period',
+		name: 'period',
+		type: 'string',
+		default: '',
+		description: 'Use the value field from the CompanyRun lookup',
+		displayOptions: {
+			show: {
+				api: ['updatePayslipComment'],
+			},
+		},
+	},
+	{
+		displayName: 'Frequency',
+		name: 'frequency',
+		type: 'string',
+		default: '',
+		description: 'Use the value field from the CompanyFrequency lookup',
+		displayOptions: {
+			show: {
+				api: ['updatePayslipComment'],
+			},
+		},
+	},
+	{
 		displayName: 'Body (Raw)',
 		name: 'assignments',
 		type: 'assignmentCollection',
 		default: {},
 		description:
-		'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
-	displayOptions: {
-		show: {
-			api: displayBodyRaw,
+			'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
+		displayOptions: {
+			show: {
+				api: displayBodyRaw,
+			},
 		},
-	},
 	},
 	{
 		displayName: 'Optional PARAMS',

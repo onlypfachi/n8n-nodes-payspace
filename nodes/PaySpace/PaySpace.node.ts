@@ -218,11 +218,14 @@ export class PaySpace implements INodeType {
 					let employeeAssetId;
 					let employeeCustomFormId;
 					let IncidentId;
-					let payrateId;
+					let payRateId;
 					let takeOnId;
 					let claimId;
 					let claimBatchId;
 					let UserWorkflowStepId;
+					let period;
+					let frequency;
+					let paySlipId;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
@@ -668,8 +671,8 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getASinglePayRateRecord':
 							config.method = 'get';
-							payrateId = this.getNodeParameter('Id', i) as any;
-							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							payRateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payRateId})`;
 							break;
 						case 'getACollectionOfPayRatesAsOfAnEffectiveDate':
 							config.method = 'get';
@@ -687,14 +690,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'updateASinglePayRateRecord':
 							config.method = 'patch';
-							payrateId = this.getNodeParameter('Id', i) as any;
-							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							payRateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payRateId})`;
 							config.data = extractData(this.getNodeParameter('assignments', i) as any);
 							break;
 						case 'deleteASinglePayRateRecord':
 							config.method = 'delete';
-							payrateId = this.getNodeParameter('Id', i) as any;
-							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payrateId})`;
+							payRateId = this.getNodeParameter('Id', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payRateId})`;
 							break;
 						case 'getACollectionOfTakeOnRecords':
 							config.method = 'get';
@@ -815,6 +818,30 @@ export class PaySpace implements INodeType {
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
 								: baseURL;
 							break;
+						case 'getACollectionOfPayslipsPDFs':
+							config.method = 'get';
+							baseURL= `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/pdf`;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							config.url = notEmpty(additionalFields)
+							? appendUrl(baseURL, additionalFields.params as IDataObject)
+							: baseURL;
+							break;
+						case 'updatePayslipComment':
+							config.method = 'patch';
+							period = this.getNodeParameter('period', i) as any;
+							frequency = this.getNodeParameter('frequency', i) as any;
+							config.url = `${apiUrl}${companyId}/EmployeePayslip/comment?period=${period}&frequency=${frequency}`;
+							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							break;
+
+						case 'getASinglePayslipPDF':
+							config.method = 'get';
+							paySlipId = this.getNodeParameter('Id', i) as string;
+							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							baseURL = `${apiUrl}${companyId}/employeepayslip/${paySlipId}/download`;
+							config.url = notEmpty(additionalFields)
+							? appendUrl(baseURL, additionalFields.params as IDataObject)
+							: baseURL;
 
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
