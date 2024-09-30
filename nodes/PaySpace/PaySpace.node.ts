@@ -21,7 +21,7 @@ import {
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
 import { appendUrl, notEmpty, mapApiArray, extractData } from './paySpace.utils';
-import { /*axios, { AxiosResponse,*/ AxiosRequestConfig } from 'axios';
+import axios, { /*axios, { AxiosResponse,*/ AxiosRequestConfig, AxiosResponse } from 'axios';
 import qs from 'qs';
 import {
 	billingEndpointsCollectionOptions,
@@ -226,6 +226,8 @@ export class PaySpace implements INodeType {
 					let period;
 					let frequency;
 					let paySlipId;
+					let month;
+					let year;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
@@ -789,6 +791,8 @@ export class PaySpace implements INodeType {
 						case 'getACollectionOfPayslips':
 							config.method = 'get';
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
+							year = this.getNodeParameter('year', i) as any;
+							month = this.getNodeParameter('month', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}`; //TODO: get the year and month
 							config.url = notEmpty(additionalFields)
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
@@ -796,7 +800,8 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfPayslipsLines':
 							config.method = 'get';
-							baseURL= `${apiUrl}${companyId}/EmployeePayslipLine/${year}/${month}`;
+							year = this.getNodeParameter('year', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeePayslipLine/${year}/${month}`;
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							config.url = notEmpty(additionalFields)
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
@@ -804,7 +809,8 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfCostedPayslipsLines':
 							config.method = 'get';
-							baseURL= `${apiUrl}${companyId}/EmployeeCostedPayslipLine/${year}/${month}`;
+							year = this.getNodeParameter('year', i) as any;
+							baseURL = `${apiUrl}${companyId}/EmployeeCostedPayslipLine/${year}/${month}`;
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							config.url = notEmpty(additionalFields)
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
@@ -812,7 +818,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfConsolidatedPayslips':
 							config.method = 'get';
-							baseURL= `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/consolidated`;
+							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/consolidated`;
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							config.url = notEmpty(additionalFields)
 								? appendUrl(baseURL, additionalFields.params as IDataObject)
@@ -820,11 +826,11 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfPayslipsPDFs':
 							config.method = 'get';
-							baseURL= `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/pdf`;
+							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/pdf`;
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							config.url = notEmpty(additionalFields)
-							? appendUrl(baseURL, additionalFields.params as IDataObject)
-							: baseURL;
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
 							break;
 						case 'updatePayslipComment':
 							config.method = 'patch';
@@ -840,8 +846,8 @@ export class PaySpace implements INodeType {
 							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/employeepayslip/${paySlipId}/download`;
 							config.url = notEmpty(additionalFields)
-							? appendUrl(baseURL, additionalFields.params as IDataObject)
-							: baseURL;
+								? appendUrl(baseURL, additionalFields.params as IDataObject)
+								: baseURL;
 
 						default:
 							// eslint-disable-next-line n8n-nodes-base/node-execute-block-wrong-error-thrown
@@ -889,8 +895,8 @@ export class PaySpace implements INodeType {
 					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig;
 				}
 
-				//const response = config; /*: AxiosResponse = await axios(config)*/
-				responseData = [{ config }];
+				const response: AxiosResponse = await axios(config);
+				responseData = [{ json: response.data }];
 				// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(
