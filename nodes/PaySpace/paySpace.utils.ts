@@ -185,11 +185,30 @@ export const requestData = {
 	data: {},
 };
 
-export const extractData = (data: { assignments: { name: string, value: string }[] }): Record<string, string> => {
-  const result: Record<string, string> = {};
-  data.assignments.forEach((assignment) => {
-    result[assignment.name] = assignment.value;
-  });
-  return result;
+export const extractData = (data: {
+	assignments: { name: string; value: string }[];
+}): Record<string, string> => {
+	const result: Record<string, string> = {};
+	data.assignments.forEach((assignment) => {
+		result[assignment.name] = assignment.value;
+	});
+	return result;
 };
+interface Company {
+	company_id: number;
+	company_name: string;
+	company_code: string;
+}
 
+interface GroupCompany {
+	group_id: number;
+	group_description: string;
+	companies: Company[];
+}
+export interface AuthResponse {
+	access_token: string;
+	expires_in: number;
+	token_type: string;
+	scope: string;
+	group_companies: GroupCompany[];
+}

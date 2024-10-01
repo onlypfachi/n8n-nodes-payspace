@@ -1,5 +1,6 @@
 import { INodeProperties } from 'n8n-workflow';
 import {
+	displayAdditionalFields,
 	//displayAdditionalFields,
 	displayBodyRaw,
 	dynamicIdDisplayArray,
@@ -113,18 +114,6 @@ export const properties: INodeProperties[] = [
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
 			'Api related to operation. Choose from the <a href="https://developer.payspace.com/">, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-	},
-	{
-		displayName: 'Token',
-		name: 'paySpaceAccessToken',
-		type: 'string',
-		default: 'Bearer: <your token here>',
-		displayOptions: {
-			show: {
-				operation: ['getMetadata', 'employee'],
-			},
-		},
-		description: 'The Authorization bearer token type',
 	},
 	{
 		displayName: 'Effective Date',
@@ -320,11 +309,11 @@ export const properties: INodeProperties[] = [
 				],
 			},
 		],
-		//	displayOptions: {
-		//	show: {
-		//	api: displayAdditionalFields,
-		//},
-		//},
+		displayOptions: {
+			show: {
+				api: displayAdditionalFields,
+			},
+		},
 	},
 	{
 		displayName: 'Axios Config',

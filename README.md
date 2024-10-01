@@ -14,14 +14,12 @@ This node supports various PaySpace API functionalities. You can configure the n
 
 - Get Token
 - Get MetaData.
-- Get Employee
-- Get Company
-- Get Lookup Values
+- Get Employee *
+- Get Company *
+- Get Lookup Values *
 - File Upload
 - Get Webhooks
 - Custom Config
-
-Note: You will need to obtain a PaySpace Authentication key and configure it in the node properties for other uses besides getting token.
 
 ## Properties
 

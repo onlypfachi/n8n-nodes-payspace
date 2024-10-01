@@ -20,7 +20,7 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, notEmpty, mapApiArray, extractData } from './paySpace.utils';
+import { appendUrl, notEmpty, mapApiArray, extractData, AuthResponse } from './paySpace.utils';
 import axios, { /*axios, { AxiosResponse,*/ AxiosRequestConfig, AxiosResponse } from 'axios';
 import qs from 'qs';
 import {
@@ -155,6 +155,7 @@ export class PaySpace implements INodeType {
 				let companyId: string | number;
 				let paySpaceAccessToken: string;
 				let additionalFields: IDataObject;
+
 				// const getMetadataResponse = {
 				// 	json: {
 				// 		success: true,
@@ -193,10 +194,39 @@ export class PaySpace implements INodeType {
 						},
 					};
 				} else if (operation === 'employee') {
+					const authdata: string = qs.stringify({
+						client_id: credentials.client_id,
+						client_secret: credentials.client_secret,
+						scope: 'api.full_access',
+					});
+
+					const authconfig = {
+						method: 'post',
+						url: authenticationUrl,
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'User-Agent': 'payspace.com',
+						},
+						data: authdata,
+					};
+
+					const getToken = async (): Promise<string | undefined> => {
+						try {
+							const response: AxiosResponse = await axios(authconfig);
+							const tokenresponse: AuthResponse = response.data;
+							return tokenresponse.access_token;
+						} catch (error) {
+							console.error('Error fetching access token:', error);
+							return undefined;
+						}
+					};
+
 					companyId = this.getNodeParameter('companyId', i) as any;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
+					const token = await getToken(); // Await the async function
+					paySpaceAccessToken = `Bearer ${token}`;
 					config = {
 						maxBodyLength: Infinity,
+						url: '',
 						headers: {
 							Authorization: paySpaceAccessToken,
 							'Content-Type': 'application/json',
@@ -897,6 +927,7 @@ export class PaySpace implements INodeType {
 
 				const response: AxiosResponse = await axios(config);
 				responseData = [{ json: response.data }];
+
 				// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
 
 				const executionData = this.helpers.constructExecutionMetaData(
