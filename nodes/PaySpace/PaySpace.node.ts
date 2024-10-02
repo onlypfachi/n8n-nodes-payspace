@@ -20,7 +20,7 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, mapApiArray, extractData, getToken } from './paySpace.utils';
+import { appendUrl, mapApiArray, getToken } from './paySpace.utils';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
@@ -258,10 +258,10 @@ export class PaySpace implements INodeType {
 						case 'createASingleEmployeeRecord':
 							baseURL = `${apiUrl}${companyId}/Employee`;
 							config.method = 'patch';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'updateASingleEmployeeRecord':
-							data = extractData(this.getNodeParameter('assignments', i) as any);
+							data = this.getNodeParameter('assignments', i) as any;
 							employeeId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/Employee(${employeeId})`;
 							config.method = 'patch';
@@ -305,7 +305,7 @@ export class PaySpace implements INodeType {
 						case 'updateASingleEmployeeAddressRecord':
 							const addressId = this.getNodeParameter('Id', i) as string;
 							baseURL = `${apiUrl}${companyId}/EmployeeAddress(${addressId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any); //see "EmployeeAddress" in metadata endpoint for available fields
+							config.data = this.getNodeParameter('assignments', i) as any; //see "EmployeeAddress" in metadata endpoint for available fields
 							config.url = appendUrl(
 								baseURL,
 								this.getNodeParameter('additionalFields', i) as IDataObject,
@@ -348,19 +348,19 @@ export class PaySpace implements INodeType {
 
 							break;
 						case 'createASingleEmploymentStatusRecord':
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus`;
 							config.method = 'post';
 
 							break;
 						case 'updateASingleEmploymentStatusRecord':
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							statusId = this.getNodeParameter('Id', i) as string;
 							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
 							break;
 						case 'employmentStatusEmployeeTermination':
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							statusId = this.getNodeParameter('Id', i) as string;
 							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
 							config.method = 'patch';
@@ -369,10 +369,10 @@ export class PaySpace implements INodeType {
 							statusId = this.getNodeParameter('Id', i) as string;
 							config.method = 'patch';
 							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'employmentStatusReinstateWithNewTaxRecord':
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							statusId = this.getNodeParameter('statusId', i) as string;
 							config.method = 'patch';
 							config.url = `${apiUrl}${companyId}/EmployeeEmploymentStatus(${statusId})`;
@@ -409,13 +409,13 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASinglePositionRecord':
 							positionId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'post';
 							break;
 						case 'updateASinglePositionRecord':
 							positionId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'patch';
 							break;
@@ -437,13 +437,13 @@ export class PaySpace implements INodeType {
 							config.url = `${apiUrl}${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							break;
 						case 'createASingleBankDetailRecord':
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeBankDetail`;
 							config.method = 'post';
 							break;
 						case 'updateASingleBankDetailRecord':
 							bankDetailId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeBankDetail(${bankDetailId})`;
 							config.method = 'patch';
 							break;
@@ -466,13 +466,13 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASingleDependantRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeDependant`;
 							break;
 						case 'updateASingleDependantRecord':
 							config.method = 'patch';
 							dependantId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeDependant(${dependantId})`;
 							break;
 						case 'deleteASingleDependantRecord':
@@ -482,7 +482,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'dependantQuickAdd':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeDependantQuickAdd`;
 							break;
 						case 'getACollectionOfEmployeeAttachments':
@@ -499,13 +499,13 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASingleEmployeeAttachment':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeAttachment`;
 							break;
 						case 'updateASingleEmployeeAttachment':
 							config.method = 'patch';
 							attachmentId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeAttachment(${attachmentId})`;
 							break;
 						case 'deleteASingleEmployeeAttachment':
@@ -535,14 +535,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASingleProjectRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeProject`;
 							break;
 						case 'updateASingleProjectRecord':
 							config.method = 'patch';
 							employeeProjectId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeProject(${employeeProjectId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteASingleProjectRecord':
 							config.method = 'delete';
@@ -563,14 +563,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createSingleAssetRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeAsset`;
 							break;
 						case 'updateSingleAssetRecord':
 							config.method = 'patch';
 							employeeAssetId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeAsset(${employeeAssetId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteSingleAssetRecord':
 							config.method = 'delete';
@@ -598,14 +598,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'postSingleCustomForm':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeCustomForm`;
 							break;
 						case 'patchSingleCustomForm':
 							config.method = 'patch';
 							employeeCustomFormId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeCustomForm(${employeeCustomFormId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteSingleCustomForm':
 							config.method = 'delete';
@@ -633,14 +633,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createSingleIncidentManagement':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}EmployeeIncident`;
 							break;
 						case 'patchSingleIncidentManagement':
 							config.method = 'patch';
 							IncidentId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}EmployeeIncident(${IncidentId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteSingleIncidentManagement':
 							config.method = 'delete';
@@ -669,14 +669,14 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASinglePayRateRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePayRate`;
 							break;
 						case 'updateASinglePayRateRecord':
 							config.method = 'patch';
 							payRateId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePayRate(${payRateId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteASinglePayRateRecord':
 							config.method = 'delete';
@@ -697,18 +697,18 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createACollectionOfTakeOnRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeTakeOn`;
 							break;
 						case 'updateASingleOfTakeOnRecord':
 							config.method = 'patch';
 							takeOnId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeTakeOn(${takeOnId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'addASingleRecurringTemplateToAnEmployee':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeRecurringTemplate`;
 							break;
 						case 'getACollectionOfClaims':
@@ -725,13 +725,13 @@ export class PaySpace implements INodeType {
 							break;
 						case 'createASingleEmployeeClaimRecord':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeClaim`;
 							break;
 						case 'uploadClaimAttachment': // TODO: fix: handle file upload
 							config.method = 'post';
 							claimId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeClaim/${claimId}/attachment/upload`;
 							config.headers = {
 								Authorization: paySpaceAccessToken,
@@ -743,7 +743,7 @@ export class PaySpace implements INodeType {
 							config.method = 'patch';
 							claimId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeClaim(${claimId})`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 						case 'deleteASingleEmployeeClaimRecord':
 							config.method = 'delete';
@@ -753,7 +753,7 @@ export class PaySpace implements INodeType {
 						case 'submitEmployeeClaimBatchForWorkflow':
 							config.method = 'post';
 							claimBatchId = this.getNodeParameter('Id', i) as any;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeClaim/${claimBatchId}/submit`;
 							break;
 						case 'getASingleEmployeeWorkflowRecord':
@@ -764,7 +764,7 @@ export class PaySpace implements INodeType {
 							break;
 						case 'submitWorkflowStep':
 							config.method = 'post';
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							UserWorkflowStepId = this.getNodeParameter('UserWorkflowStepId', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeeWorkflow/${UserWorkflowStepId}/submit`;
 							break;
@@ -812,7 +812,7 @@ export class PaySpace implements INodeType {
 							period = this.getNodeParameter('period', i) as any;
 							frequency = this.getNodeParameter('frequency', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePayslip/comment?period=${period}&frequency=${frequency}`;
-							config.data = extractData(this.getNodeParameter('assignments', i) as any);
+							config.data = this.getNodeParameter('assignments', i) as any;
 							break;
 
 						case 'getASinglePayslipPDF':
@@ -867,7 +867,8 @@ export class PaySpace implements INodeType {
 					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig;
 				}
 
-				const response: AxiosResponse = await axios(config);
+				 const response: AxiosResponse = await axios(config);
+
 				responseData = [{ json: response.data }];
 
 				// operation === 'getMetadata' ? getMetadataResponse : [{ json: response.data }];
