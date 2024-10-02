@@ -20,8 +20,8 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, notEmpty, mapApiArray, extractData, AuthResponse } from './paySpace.utils';
-import axios, { /*axios, { AxiosResponse,*/ AxiosRequestConfig, AxiosResponse } from 'axios';
+import { appendUrl, mapApiArray, extractData, getToken } from './paySpace.utils';
+import  axios, {  AxiosResponse , AxiosRequestConfig} from 'axios';
 import qs from 'qs';
 import {
 	billingEndpointsCollectionOptions,
@@ -135,7 +135,10 @@ export class PaySpace implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
-		const credentials = await this.getCredentials('clientCredentialApi');
+		const credentials = (await this.getCredentials('clientCredentialApi')) as {
+			client_id: string;
+			client_secret: string;
+		};
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {
@@ -153,17 +156,13 @@ export class PaySpace implements INodeType {
 
 				let config: AxiosRequestConfig = {};
 				let companyId: string | number;
-				let paySpaceAccessToken: string;
-				let additionalFields: IDataObject;
 
-				// const getMetadataResponse = {
-				// 	json: {
-				// 		success: true,
-				// 		message: 'Successfully got data',
-				// 		config:
-				// 			'The response data is too large to display. Use Postman to view the response. https://www.postman.com/',
-				// 	},
-				// };
+				// Get Token for other operations
+				const client_id = credentials?.client_id;
+				const client_secret = credentials.client_secret;
+				const url = authenticationUrl;
+				const token = await getToken({ client_id, client_secret, url });
+				const paySpaceAccessToken = `Bearer ${token}`;
 
 				if (operation === 'authorization') {
 					// Get access token
@@ -182,9 +181,10 @@ export class PaySpace implements INodeType {
 						data: data,
 					};
 				} else if (operation === 'getMetadata') {
+					companyId = this.getNodeParameter('companyId', i) as any;
+
 					// Get Meta Data
 					companyId = this.getNodeParameter('companyId', i) as number;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 
 					config = {
 						method: 'get',
@@ -194,36 +194,8 @@ export class PaySpace implements INodeType {
 						},
 					};
 				} else if (operation === 'employee') {
-					const authdata: string = qs.stringify({
-						client_id: credentials.client_id,
-						client_secret: credentials.client_secret,
-						scope: 'api.full_access',
-					});
-
-					const authconfig = {
-						method: 'post',
-						url: authenticationUrl,
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-							'User-Agent': 'payspace.com',
-						},
-						data: authdata,
-					};
-
-					const getToken = async (): Promise<string | undefined> => {
-						try {
-							const response: AxiosResponse = await axios(authconfig);
-							const tokenresponse: AuthResponse = response.data;
-							return tokenresponse.access_token;
-						} catch (error) {
-							console.error('Error fetching access token:', error);
-							return undefined;
-						}
-					};
-
 					companyId = this.getNodeParameter('companyId', i) as any;
-					const token = await getToken(); // Await the async function
-					paySpaceAccessToken = `Bearer ${token}`;
+
 					config = {
 						maxBodyLength: Infinity,
 						url: '',
@@ -258,25 +230,24 @@ export class PaySpace implements INodeType {
 					let paySlipId;
 					let month;
 					let year;
+					const addParams = this.getNodeParameter('addParams', i) as boolean;
 
 					switch (
 						api //TODO: ADD DESCRIPTIONS TO OPTIONS
 					) {
 						case 'getACollectionOfEmployees':
 							baseURL = `${apiUrl}${companyId}/Employee?`;
-							additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 							config.method = 'get';
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfEmployeesAsOfAnEffectiveDate':
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
-							additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 							baseURL = `${apiUrl}${companyId}/Employee/effective/${effectiveDate}?`;
 							config.method = 'get';
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleEmployeeRecord':
@@ -325,29 +296,26 @@ export class PaySpace implements INodeType {
 						case 'getAnEmployeeAddress':
 							const EmployeeNumber = this.getNodeParameter('employeeNumber', i) as string;
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeAddress/${EmployeeNumber}`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 
 							break;
 						case 'updateASingleEmployeeAddressRecord':
 							const addressId = this.getNodeParameter('Id', i) as string;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeAddress(${addressId})`;
 							config.data = extractData(this.getNodeParameter('assignments', i) as any); //see "EmployeeAddress" in metadata endpoint for available fields
-							config.url = appendUrl(baseURL, additionalFields.params as IDataObject);
+							config.url = appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject);
 							config.method = 'patch';
 							config.headers = {
 								'Content-Type': 'application/json',
 							};
 							break;
 						case 'getACollectionOfEmploymentStatus':
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeEmploymentStatus?`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							config.method = 'get';
 							break;
@@ -359,21 +327,19 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfEmploymentStatusesAsOfAnEffectiveDate':
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as string;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
+							config.url = addParams
 								? appendUrl(
 										`${apiUrl}${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`,
-										additionalFields,
+										this.getNodeParameter('additionalFields', i) as IDataObject,
 								  )
 								: `${apiUrl}${companyId}/EmployeeEmploymentStatus/effective/${effectiveDate}`; //
 							config.method = 'get';
 
 							break;
 						case 'getACollectionOfAllEmploymentStatuses':
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeEmploymentStatus/all`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL; //
 							config.method = 'get';
 
@@ -416,10 +382,9 @@ export class PaySpace implements INodeType {
 
 							break;
 						case 'getACollectionOfPositions': //Position
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePosition?`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							config.method = 'get';
 							break;
@@ -431,10 +396,9 @@ export class PaySpace implements INodeType {
 						case 'getACollectionOfPositionsAsOfAnEffectiveDate':
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePosition/effective/${effectiveDate}`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							config.headers = {
 								Authorization: paySpaceAccessToken,
@@ -460,12 +424,8 @@ export class PaySpace implements INodeType {
 						case 'getACollectionOfBankDetailRecords': //Bank Details
 							baseURL = `${apiUrl}${companyId}/EmployeeBankDetail?`;
 							config.method = 'get';
-							additionalFields = additionalFields = this.getNodeParameter(
-								'additionalFields',
-								i,
-							) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleBankDetailRecord':
@@ -491,10 +451,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfDependants': //Dependants
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeDependant`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleDependantRecord':
@@ -525,10 +484,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfEmployeeAttachments':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeAttachment`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleEmployeeAttachment':
@@ -554,19 +512,17 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfProjects':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeProject`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfProjectsAsOfAnEffectiveDate':
 							config.method = 'get';
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeProject?effectiveDate=${effectiveDate}`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleProjectRecord':
@@ -592,10 +548,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getCollectionOfAssets':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeAsset`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getSingleAssetRecord':
@@ -621,19 +576,17 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getCollectionOfCustomForms':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeCustomForm`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getCollectionOfCustomFormsByCategory':
 							const category = this.getNodeParameter('category', i) as any;
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeCustomForm?category=${category}`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 						case 'getSingleCustomForm':
 							config.method = 'get';
@@ -658,18 +611,16 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getCollectionOfEmployeeInbox':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeInbox`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfIncidentManagement':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeIncident`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getSingleIncidentManagement':
@@ -695,10 +646,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfPayRates':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePayRate`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASinglePayRateRecord':
@@ -709,10 +659,9 @@ export class PaySpace implements INodeType {
 						case 'getACollectionOfPayRatesAsOfAnEffectiveDate':
 							config.method = 'get';
 							effectiveDate = this.getNodeParameter('effectiveDate', i) as any;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePayRate?effectiveDate=${effectiveDate}`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'createASinglePayRateRecord':
@@ -733,10 +682,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfTakeOnRecords':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeTakeOn`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleOfTakeOnRecord':
@@ -762,10 +710,9 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfClaims':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeClaim`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getASingleEmployeeClaimRecord':
@@ -820,46 +767,41 @@ export class PaySpace implements INodeType {
 							break;
 						case 'getACollectionOfPayslips':
 							config.method = 'get';
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							year = this.getNodeParameter('year', i) as any;
 							month = this.getNodeParameter('month', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}`; //TODO: get the year and month
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfPayslipsLines':
 							config.method = 'get';
 							year = this.getNodeParameter('year', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeePayslipLine/${year}/${month}`;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfCostedPayslipsLines':
 							config.method = 'get';
 							year = this.getNodeParameter('year', i) as any;
 							baseURL = `${apiUrl}${companyId}/EmployeeCostedPayslipLine/${year}/${month}`;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfConsolidatedPayslips':
 							config.method = 'get';
 							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/consolidated`;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'getACollectionOfPayslipsPDFs':
 							config.method = 'get';
 							baseURL = `${apiUrl}${companyId}/EmployeePayslip/${year}/${month}/pdf`;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 							break;
 						case 'updatePayslipComment':
@@ -873,10 +815,9 @@ export class PaySpace implements INodeType {
 						case 'getASinglePayslipPDF':
 							config.method = 'get';
 							paySlipId = this.getNodeParameter('Id', i) as string;
-							additionalFields = this.getNodeParameter('additionalFields', i) as any;
 							baseURL = `${apiUrl}${companyId}/employeepayslip/${paySlipId}/download`;
-							config.url = notEmpty(additionalFields)
-								? appendUrl(baseURL, additionalFields.params as IDataObject)
+							config.url = addParams
+								? appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject)
 								: baseURL;
 
 						default:
@@ -886,16 +827,13 @@ export class PaySpace implements INodeType {
 					}
 				} else if (operation === 'company') {
 					companyId = this.getNodeParameter('companyId', i) as number;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 				} else if (operation === 'lookUpValue') {
 					companyId = this.getNodeParameter('companyId', i) as number;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
-					let lookUpValueApi = this.getNodeParameter('api', i) as string;
-					additionalFields = this.getNodeParameter('additionalFields', i) as any;
+					let lookUpValueApi = this.getNodeParameter('api', i) as string
 					config = {
 						method: 'get',
 						maxBodyLength: Infinity,
-						url: appendUrl(`${apiUrl}${companyId}${lookUpValueApi}?`, additionalFields),
+						url: appendUrl(`${apiUrl}${companyId}${lookUpValueApi}?`, this.getNodeParameter('additionalFields', i) as IDataObject),
 						headers: {
 							Authorization: paySpaceAccessToken,
 							'Content-Type': 'application/json',
@@ -903,10 +841,8 @@ export class PaySpace implements INodeType {
 					};
 				} else if (operation === 'fileUpload') {
 					companyId = this.getNodeParameter('companyId', i) as number;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 				} else if (operation === 'webhooks') {
 					companyId = this.getNodeParameter('companyId', i) as number;
-					paySpaceAccessToken = this.getNodeParameter('paySpaceAccessToken', i) as string;
 					const entityType = this.getNodeParameter('entityType', i) as string;
 					const fromDate = this.getNodeParameter('fromDate', i) as string;
 					const toDate = this.getNodeParameter('toDate', i) as string;

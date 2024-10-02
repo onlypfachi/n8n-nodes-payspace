@@ -105,13 +105,8 @@ export const paramsOptions: INodeProperties[] = [
 		name: 'componentCodes',
 		type: 'string',
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
-		description: 'Optional - A comma seperated list of component codes to returneg. BAS,COMM',
+		description: 'Optional - A comma-separated list of component codes to returneg. BAS,COMM',
 		default: '',
-		displayOptions: {
-			show: {
-				api: ['getACollectionOfConsolidatedPayslips'],
-			},
-		}
 	},
 	{
 		displayName: 'altLanguage',
@@ -119,11 +114,6 @@ export const paramsOptions: INodeProperties[] = [
 		type: 'boolean',
 		description: 'Whether - Retrieves the payslip components in the alternative language',
 		default: true,
-		displayOptions: {
-			show: {
-				api: ['getACollectionOfPayslipsPDFs'],
-			},
-		}
 	},
 ];
 

@@ -1,5 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
+import qs from 'qs';
 import {
 	adjustmentsApiOptions,
 	applicationApiOptions,
@@ -67,10 +68,11 @@ import {
 export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequestConfig['url'] => {
 	let urlParams = '';
 	for (const [key, value] of Object.entries(params)) {
-		if (value !== undefined && value !== '') {
+		if (value !== undefined && value !== '' && value !== null && value !== 0) {
 			urlParams += `&$${key}=${value}`;
 		}
 	}
+
 	// Remove the leading '&'
 	urlParams = urlParams.replace(/^\&/, '');
 
@@ -82,14 +84,6 @@ export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequest
 	return updatedUrl;
 };
 
-export const notEmpty = (obj: IDataObject) => {
-	for (let key in obj) {
-		if (obj.hasOwnProperty(key)) {
-			return true; // Object has at least one property
-		}
-	}
-	return false; // Object is empty
-};
 
 export const getBodyDataPlaceholder = (api: string): string => {
 	let bodyDataPlaceholder: string = '';
@@ -212,3 +206,38 @@ export interface AuthResponse {
 	scope: string;
 	group_companies: GroupCompany[];
 }
+interface AuthParams {
+	client_id: string;
+	client_secret: string;
+	url: string;
+}
+
+export const getToken = async ({
+	client_id,
+	client_secret,
+	url,
+}: AuthParams): Promise<string | undefined> => {
+	const authdata: string = qs.stringify({
+		client_id: client_id,
+		client_secret: client_secret,
+		scope: 'api.full_access',
+	});
+
+	const authconfig: AxiosRequestConfig = {
+		method: 'post',
+		url: url,
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'User-Agent': 'payspace.com',
+		},
+		data: authdata,
+	};
+	try {
+		const response: AxiosResponse = await axios(authconfig);
+		const tokenresponse: AuthResponse = response.data;
+		return tokenresponse.access_token;
+	} catch (error) {
+		console.error('Error fetching access token:', error);
+		return undefined;
+	}
+};

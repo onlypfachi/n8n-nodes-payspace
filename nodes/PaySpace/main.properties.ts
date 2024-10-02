@@ -1,11 +1,9 @@
 import { INodeProperties } from 'n8n-workflow';
 import {
-	displayAdditionalFields,
-	//displayAdditionalFields,
 	displayBodyRaw,
 	dynamicIdDisplayArray,
 	operationsOptions,
-	//paramsOptions,
+	paramsOptions,
 	scopeOptions,
 } from './options/main.options';
 import { requestData } from './paySpace.utils';
@@ -221,97 +219,26 @@ export const properties: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Optional Params',
+		displayName: 'Add Params',
+		name: 'addParams',
+		description: 'Whether to add additional parameters',
+		type: 'boolean',
+		default: false,
+	},
+	{
+		displayName: 'Additional Fields',
 		name: 'additionalFields',
-		placeholder: 'Additional optional params',
-		type: 'fixedCollection',
+		placeholder: 'add optional additional fields',
+		type: 'collection',
 		default: {},
 		typeOptions: {
-			multipleValues: true,
+			multipleValues: false,
 		},
 		description: 'Optional query parameter',
-		options: [
-			{
-				name: 'params',
-				displayName: 'Parameters',
-				values: [
-					{
-						displayName: 'Order By',
-						name: 'orderBy',
-						type: 'string',
-						description: 'Optional (string) - Specifies the order in which items are returned',
-						default: '',
-					},
-					{
-						displayName: 'Top',
-						name: 'top',
-						type: 'number',
-						description:
-							'Optional (integer($int32)) - Limits the number of items returned from a collection',
-						default: 100,
-					},
-					{
-						displayName: 'Skip',
-						name: 'skip',
-						type: 'number',
-						description:
-							'Optional (integer($int32)) - Excludes the specified number of items of the queried collection from the result',
-						default: 0,
-					},
-					{
-						displayName: 'Count',
-						name: 'count',
-						type: 'boolean',
-						description: 'Whether the service returns only the count of objects in the collection',
-						default: true,
-					},
-					{
-						displayName: 'Select',
-						name: 'select',
-						type: 'string',
-						description: 'Optional (string) - Returns only the fields specified',
-						default: '',
-					},
-					{
-						displayName: 'Filter',
-						name: 'filter',
-						type: 'string',
-						// eslint-disable-next-line n8n-nodes-base/node-param-description-unneeded-backticks
-						description: `Filter by field eg. "EmployeeNumber eq 'Emp01'". see https://docs.microsoft.com/en-us/dynamics-nav/using-filter-expressions-in-odata-uris`,
-						default: '',
-					},
-					{
-						displayName: 'componentCodes',
-						name: 'componentCodes',
-						type: 'string',
-						// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
-						description:
-							'Optional - A comma seperated list of component codes to returneg. BAS,COMM',
-						default: '',
-						displayOptions: {
-							show: {
-								api: ['getACollectionOfConsolidatedPayslips'],
-							},
-						},
-					},
-					{
-						displayName: 'altLanguage',
-						name: 'altLanguage',
-						type: 'boolean',
-						description: 'Whether - Retrieves the payslip components in the alternative language',
-						default: true,
-						displayOptions: {
-							show: {
-								api: ['getACollectionOfPayslipsPDFs'],
-							},
-						},
-					},
-				],
-			},
-		],
+		options: paramsOptions,
 		displayOptions: {
 			show: {
-				api: displayAdditionalFields,
+				addParams: [true],
 			},
 		},
 	},
