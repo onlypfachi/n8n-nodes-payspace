@@ -145,7 +145,7 @@ export const properties: INodeProperties[] = [
 		displayName: 'ID',
 		name: 'Id',
 		type: 'string',
-		hint: "Id could be 'EmployeeId' or 'EmployeePositionId' depend on the api",
+		hint: "Id could be 'EmployeeId' or 'EmployeePositionId' depend on the api requested",
 		default: '',
 		description:
 			'Enter the ID for the api operation. Please visit https://developer.payspace.com/ and see the ID in the URL if you are not sure.',
@@ -209,7 +209,7 @@ export const properties: INodeProperties[] = [
 		displayName: 'Body (Raw)',
 		name: 'assignments',
 		type: 'json',
-		default: {},
+		default: '',
 		description:
 			'See in metadata endpoint for available fields OR visit https://developer.payspace.com/ if you are not sure',
 		displayOptions: {
