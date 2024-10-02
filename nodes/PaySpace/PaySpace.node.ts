@@ -21,7 +21,7 @@ import {
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
 import { appendUrl, mapApiArray, extractData, getToken } from './paySpace.utils';
-import  axios, {  AxiosResponse , AxiosRequestConfig} from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
 	billingEndpointsCollectionOptions,
@@ -260,7 +260,7 @@ export class PaySpace implements INodeType {
 							config.method = 'patch';
 							config.data = extractData(this.getNodeParameter('assignments', i) as any);
 							break;
-						case 'UpdateASingleEmployeeRecord':
+						case 'updateASingleEmployeeRecord':
 							data = extractData(this.getNodeParameter('assignments', i) as any);
 							employeeId = this.getNodeParameter('Id', i) as any;
 							config.url = `${apiUrl}${companyId}/Employee(${employeeId})`;
@@ -306,7 +306,10 @@ export class PaySpace implements INodeType {
 							const addressId = this.getNodeParameter('Id', i) as string;
 							baseURL = `${apiUrl}${companyId}/EmployeeAddress(${addressId})`;
 							config.data = extractData(this.getNodeParameter('assignments', i) as any); //see "EmployeeAddress" in metadata endpoint for available fields
-							config.url = appendUrl(baseURL, this.getNodeParameter('additionalFields', i) as IDataObject);
+							config.url = appendUrl(
+								baseURL,
+								this.getNodeParameter('additionalFields', i) as IDataObject,
+							);
 							config.method = 'patch';
 							config.headers = {
 								'Content-Type': 'application/json',
@@ -829,11 +832,14 @@ export class PaySpace implements INodeType {
 					companyId = this.getNodeParameter('companyId', i) as number;
 				} else if (operation === 'lookUpValue') {
 					companyId = this.getNodeParameter('companyId', i) as number;
-					let lookUpValueApi = this.getNodeParameter('api', i) as string
+					let lookUpValueApi = this.getNodeParameter('api', i) as string;
 					config = {
 						method: 'get',
 						maxBodyLength: Infinity,
-						url: appendUrl(`${apiUrl}${companyId}${lookUpValueApi}?`, this.getNodeParameter('additionalFields', i) as IDataObject),
+						url: appendUrl(
+							`${apiUrl}${companyId}${lookUpValueApi}?`,
+							this.getNodeParameter('additionalFields', i) as IDataObject,
+						),
 						headers: {
 							Authorization: paySpaceAccessToken,
 							'Content-Type': 'application/json',
