@@ -132,7 +132,6 @@ export const dynamicIdDisplayArray = [
 	'updateASingleDependantRecord',
 	'deleteASingleDependantRecord',
 	'getASinglePositionRecord',
-	'createASinglePositionRecord',
 	'updateASingleEmployeeAddressRecord',
 	'getASingleEmployeeRecord',
 	'updateASingleEmployeeRecord',
@@ -145,6 +144,7 @@ export const dynamicIdDisplayArray = [
 	'employmentStatusReinstateSameRecord',
 	'updateASingleEmployeeRecord',
 	'getASingleEmployeeRecord',
+	'updateASinglePositionRecord',
 ];
 
 export const displayBodyRaw = [
@@ -163,6 +163,8 @@ export const displayBodyRaw = [
 	'createASingleDependantRecord',
 	'updateASingleBankDetailRecord',
 	'updateASingleEmployeeRecord',
+	'updateASinglePositionRecord',
+	'createASinglePositionRecord',
 ];
 
 export const displayAdditionalFields = [

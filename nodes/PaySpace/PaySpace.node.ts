@@ -408,7 +408,6 @@ export class PaySpace implements INodeType {
 							};
 							break;
 						case 'createASinglePositionRecord':
-							positionId = this.getNodeParameter('Id', i) as any;
 							config.data = this.getNodeParameter('assignments', i) as any;
 							config.url = `${apiUrl}${companyId}/EmployeePosition(${positionId})`;
 							config.method = 'post';
@@ -867,7 +866,7 @@ export class PaySpace implements INodeType {
 					config = this.getNodeParameter('customConfig', i) as AxiosRequestConfig;
 				}
 
-				 const response: AxiosResponse = await axios(config);
+				const response: AxiosResponse = await axios(config);
 
 				responseData = [{ json: response.data }];
 

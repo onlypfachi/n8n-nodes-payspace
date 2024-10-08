@@ -85,8 +85,8 @@ export const basicInformationEndpointsCollectionOptions: INodePropertyOptions[] 
 		value: 'projectDetails',
 	},
 	{
-		name: 'Tax Profile',
-		value: 'taxProfile',
+		name: 'Tax Profiles',
+		value: 'taxProfiles',
 	},
 ];
 
@@ -149,7 +149,7 @@ export const suspensionEndpointsCollectionOptions: INodePropertyOptions[] = [
 	{
 		name: 'Suspension',
 		value: 'suspensionEndpoint',
-	}
+	},
 ];
 export const otherEndpointsCollectionOptions: INodePropertyOptions[] = [
 	{
@@ -284,7 +284,7 @@ export const taxProfilesApiOptions = [
 export const positionsApiOptions = [
 	{
 		name: 'Get a Collection of Positions',
-		value: 'getCollectionOfPositions',
+		value: 'getACollectionOfPositions',
 	},
 	{
 		name: 'Get a Single Position Record',
@@ -292,7 +292,7 @@ export const positionsApiOptions = [
 	},
 	{
 		name: 'Get a Collection of Positions as of an Effective Date',
-		value: 'getACollectionOfPositions',
+		value: 'getACollectionOfPositionsAsOfAnEffectiveDate',
 	},
 	{
 		name: 'Create a Single Position Record',
@@ -596,7 +596,6 @@ export const recurringTemplatesApiOptions = [
 	},
 ];
 export const claimsApiOptions = [
-
 	{
 		name: 'Get a Collection of Claims',
 		value: 'getACollectionOfClaims',
@@ -656,7 +655,7 @@ export const bonusProvisionApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const companyCarApiOptions = [
 	{
@@ -674,7 +673,7 @@ export const companyCarApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const employeeComponentsApiOptions = [
 	{
@@ -692,8 +691,7 @@ export const employeeComponentsApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
-
+	},
 ];
 export const groupLifeApiOptions = [
 	{
@@ -711,7 +709,7 @@ export const groupLifeApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const incomeProtectionApiOptions = [
 	{
@@ -729,7 +727,7 @@ export const incomeProtectionApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const medicalAidApiOptions = [
 	{
@@ -747,8 +745,7 @@ export const medicalAidApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
-
+	},
 ];
 export const savingApiOptions = [
 	{
@@ -766,7 +763,7 @@ export const savingApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const travelBusinessUsageApiOptions = [
 	{
@@ -784,8 +781,7 @@ export const travelBusinessUsageApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
-
+	},
 ];
 export const garnisheesApiOptions = [
 	{
@@ -803,7 +799,7 @@ export const garnisheesApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const unionsApiOptions = [
 	{
@@ -821,7 +817,7 @@ export const unionsApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const disabilityApiOptions = [
 	{
@@ -839,7 +835,7 @@ export const disabilityApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const retirementAnnuityApiOptions = [
 	{
@@ -857,7 +853,7 @@ export const retirementAnnuityApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const pensionApiOptions = [
 	{
@@ -875,7 +871,7 @@ export const pensionApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const loansApiOptions = [
 	{
@@ -893,7 +889,7 @@ export const loansApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 export const housePaymentApiOptions = [
 	{
@@ -911,11 +907,10 @@ export const housePaymentApiOptions = [
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
 
 export const payslipsApiOptions = [
-
 	{
 		name: 'Get a Collection of Payslips',
 		value: 'getACollectionOfPayslips',
@@ -978,7 +973,6 @@ export const taxCertificatesApiOptions = [
 	},
 ];
 export const adjustmentsApiOptions = [
-
 	{
 		name: 'Get Collection',
 		value: 'getCollection',
@@ -1024,10 +1018,9 @@ export const setupApiOptions = [
 	{
 		name: 'Delete Existing',
 		value: 'deleteExisting',
-	}
+	},
 ];
 export const applicationApiOptions = [
-
 	{
 		name: 'Get Collection',
 		value: 'getCollection',
@@ -1055,7 +1048,6 @@ export const applicationApiOptions = [
 ];
 
 export const suspensionApiOptions = [
-
 	{
 		name: 'Get a Collection of Suspensions',
 		value: 'getACollectionOfSuspensions',
@@ -1077,7 +1069,8 @@ export const suspensionApiOptions = [
 		value: 'deleteASingleSuspensionRecord',
 	},
 ];
-export const simpleApiOptions = [ // TODO: simpleApiOptions
+export const simpleApiOptions = [
+	// TODO: simpleApiOptions
 	{
 		name: 'Get Collection',
 		value: 'getCollection',
@@ -1093,39 +1086,40 @@ export const simpleApiOptions = [ // TODO: simpleApiOptions
 	{
 		name: 'Delete Existing Record',
 		value: 'deleteExistingRecord',
-	}
+	},
 ];
-export const outOfOfficeApiOptions = simpleApiOptions // using simpleApiOptions
+export const outOfOfficeApiOptions = simpleApiOptions; // using simpleApiOptions
 
-export const notesApiOptions = simpleApiOptions
+export const notesApiOptions = simpleApiOptions;
 
-export const employeeTrainingApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
-export const employeeQualificationsApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
-export const employeeSkillsApiOptions = simpleApiOptions // using simpleApiOptions changed (single to existing)
+export const employeeTrainingApiOptions = simpleApiOptions; // using simpleApiOptions changed (single to existing)
+export const employeeQualificationsApiOptions = simpleApiOptions; // using simpleApiOptions changed (single to existing)
+export const employeeSkillsApiOptions = simpleApiOptions; // using simpleApiOptions changed (single to existing)
 
 export const recurringCostingSplitApiOptions = [
 	{
 		name: 'Get Collection',
 		value: 'getCollection',
 	},
-	{ name: 'Get a Collection as of an Effective Date',
-		value: 'getACollectionAsOfAnEffectiveDate',
-	},
-	{ name: 'Get a Collection of All Records',
-		value: 'getACollectionOfAllRecords',
-	}
+	{ name: 'Get a Collection as of an Effective Date', value: 'getACollectionAsOfAnEffectiveDate' },
+	{ name: 'Get a Collection of All Records', value: 'getACollectionOfAllRecords' },
 ];
 
-export const employeeReviewHeaderApiOptions =[{
-	name: 'Get Collection',
-	value: 'getCollection',
-},];
-export const employeeReviewKPAApiOptions =[{
-	name: 'Get Collection',
-	value: 'getCollection',
-},];
-export const employeeReviewTemplateApiOptions =[{
-	name: 'Get Collection',
-	value: 'getCollection',
-},];
-
+export const employeeReviewHeaderApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+];
+export const employeeReviewKPAApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+];
+export const employeeReviewTemplateApiOptions = [
+	{
+		name: 'Get Collection',
+		value: 'getCollection',
+	},
+];

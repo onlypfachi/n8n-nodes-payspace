@@ -84,7 +84,6 @@ export const appendUrl = (baseApiUrl: string, params: IDataObject): AxiosRequest
 	return updatedUrl;
 };
 
-
 export const getBodyDataPlaceholder = (api: string): string => {
 	let bodyDataPlaceholder: string = '';
 
