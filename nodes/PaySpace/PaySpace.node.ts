@@ -256,7 +256,7 @@ export class PaySpace implements INodeType {
               config.url = `${apiUrl}${companyId}/Employee(${employeeId})`;
               break;
             case 'createASingleEmployeeRecord':
-              baseURL = `${apiUrl}${companyId}/Employee`;
+              config.url = `${apiUrl}${companyId}/Employee`;
               config.method = 'post';
               config.data = this.getNodeParameter('assignments', i) as any;
               break;
