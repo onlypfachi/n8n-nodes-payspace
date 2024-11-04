@@ -1,4 +1,5 @@
 import type { ICredentialType, INodeProperties } from 'n8n-workflow';
+import { scopeOptions } from '../nodes/PaySpace/options/main.options';
 
 export class PaySpaceApi implements ICredentialType {
 	name = 'clientCredentialApi';
@@ -21,6 +22,13 @@ export class PaySpaceApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
+		},
+		{
+			displayName: 'Scope',
+			name: 'client_scope',
+			type: 'options',
+			options: scopeOptions,
+			default: 'api.full_access',
 		},
 	];
 }
