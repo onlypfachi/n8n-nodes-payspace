@@ -30,9 +30,10 @@ This node supports various PaySpace API functionalities. You can configure the n
 ## Values
 You can use these values for expressions 
 ### Company Identifier Field	
-```	1- company_id
-		2- company_name
-		3- company_code
+```
+1- company_id
+2- company_name
+3- company_code
 ```
 
 	
