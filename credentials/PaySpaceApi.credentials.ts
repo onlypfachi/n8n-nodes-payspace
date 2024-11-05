@@ -30,5 +30,22 @@ export class PaySpaceApi implements ICredentialType {
 			options: scopeOptions,
 			default: 'api.full_access',
 		},
+		{
+			displayName: 'Environment',
+			name: 'environment',
+			type: 'options',
+			options: [
+				{
+					name: 'Staging',
+					value: 'staging',
+				},
+				{
+					name: 'Production',
+					value: 'production',
+				},
+			],
+			default: 'staging',
+			description: 'Which environment do you want to query in?',
+		},
 	];
 }

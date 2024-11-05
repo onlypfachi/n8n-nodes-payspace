@@ -9,24 +9,6 @@ import { requestData } from './paySpace.utils';
 
 export const properties: INodeProperties[] = [
 	{
-		displayName: 'Environment',
-		name: 'environment',
-		type: 'options',
-		noDataExpression: true,
-		options: [
-			{
-				name: 'Staging',
-				value: 'staging',
-			},
-			{
-				name: 'Production',
-				value: 'production',
-			},
-		],
-		default: 'staging',
-		description: 'Which environment do you want to query in?',
-	},
-	{
 		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
@@ -36,8 +18,8 @@ export const properties: INodeProperties[] = [
 		description: 'Which operation to use?',
 	},
 	{
-		displayName: 'Company Identifier',
-		name: 'company_identifier',
+		displayName: 'Company Identifier Field',
+		name: 'identifier_field',
 		type: 'options',
 		noDataExpression: true,
 		options: [
@@ -60,12 +42,12 @@ export const properties: INodeProperties[] = [
 			},
 		},
 		default: 'company_code',
-		description: 'Which environment do you want to query in?',
+		description: 'Which identifier do you want to use to select the target company?',
 	},
 
 	{
-		displayName: 'Company ID',
-		name: 'companyId',
+		displayName: 'Identifier',
+		name: 'identifier',
 		type: 'string',
 		default: '',
 		displayOptions: {
@@ -73,7 +55,7 @@ export const properties: INodeProperties[] = [
 				operation: ['authorization', 'customConfig'],
 			},
 		},
-		placeholder: 'The Company ID',
+		placeholder: 'The Company ID or name or code',
 	},
 	{
 		displayName: 'Endpoint Collection Name or ID',

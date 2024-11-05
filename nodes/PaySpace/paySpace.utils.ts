@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { IDataObject, INodePropertyOptions } from 'n8n-workflow';
+import { IDataObject, INode, INodePropertyOptions, NodeOperationError } from 'n8n-workflow';
 import qs from 'qs';
 import {
 	adjustmentsApiOptions,
@@ -187,7 +187,7 @@ export const extractData = (data: {
 	});
 	return result;
 };
-interface Company {
+export interface Company {
 	company_id: number;
 	company_name: string;
 	company_code: string;
@@ -203,17 +203,18 @@ export interface AuthResponse {
 	expires_in: number;
 	token_type: string;
 	scope: string;
-	group_companies: GroupCompany;
+	group_companies: GroupCompany[];
 }
 interface AuthParams {
 	client_id: string;
 	client_secret: string;
 	url: string;
 	client_scope: string;
-	company: string;
-	company_identifier: string;
+	identifier: string;
+	identifier_field: keyof Company;
+	node: INode;
 }
-interface GetTokenResponse {
+export interface ExecutionAuth {
 	token: string;
 	company?: Company;
 }
@@ -223,9 +224,10 @@ export const getTokenAndCompany = async ({
 	client_secret,
 	url,
 	client_scope,
-	company,
-	company_identifier,
-}: AuthParams): Promise<GetTokenResponse | undefined> => {
+	identifier,
+	identifier_field,
+	node,
+}: AuthParams): Promise<ExecutionAuth> => {
 	const authdata: string = qs.stringify({
 		client_id: client_id,
 		client_secret: client_secret,
@@ -244,21 +246,35 @@ export const getTokenAndCompany = async ({
 	try {
 		const response: AxiosResponse = await axios(authconfig);
 		const r: AuthResponse = response.data;
-		const selectedCompany = r.group_companies.companies.find((c: Company) => {
-			if (company_identifier === 'company_code') {
-				return c.company_code === company;
-			} else if (company_identifier === 'company_name') {
-				return c.company_name === company;
-			}
-			return false;
+
+		if (!r.group_companies || !r.group_companies[0].companies) {
+			throw new NodeOperationError(node, `group_companies or companies data is missing from the response: ${JSON.stringify(r)} `);
+		}
+		const selectedCompany = r.group_companies.map((group) => {
+			const foundCompany = group.companies.find((company) => {
+				if (identifier_field === 'company_id') {
+					return isNaN(Number(identifier))
+						? false
+						: company.company_id === Number(identifier);
+				} else {
+					return company[identifier_field] === identifier;
+				}
+			});
+
+			return {
+				group_description: group.group_description,
+				company: foundCompany || undefined,
+			};
 		});
+
+		const foundCompanies = selectedCompany.filter((group) => group.company !== undefined);
 
 		return {
 			token: r.access_token,
-			company: selectedCompany,
+			company: foundCompanies.length > 0 ? foundCompanies[0].company : undefined,
 		};
+
 	} catch (error) {
-		console.error('Error fetching access token:', error);
-		return undefined;
+		throw new NodeOperationError(node, `Auth Error Trying To Get Token: ${error}`);
 	}
 };

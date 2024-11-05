@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-payspace",
-  "version": "0.2.13",
+  "version": "1.0.00",
   "description": "n8n node to call Payspace API services.",
   "keywords": [
     "n8n-community-node-package",

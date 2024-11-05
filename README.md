@@ -27,6 +27,15 @@ This node supports various PaySpace API functionalities. You can configure the n
 - Operation: Choose the desired API operation (Get token, Get Metadata, etc.).
 - Api: Choose the desired API endpoint according to your needs.
 
+## Values
+You can use these values for expressions 
+	- Company Identifier Field	
+	```	1- company_id
+		2- company_name
+		3- company_code```
+
+	
+
 ## Override Config
 
 This node uses NodeJs-Axios. If what you want to do is not working with provided API options you can override the ```Axios.config``` by selecting ```CustomConfig``` in the operation. This will give you direct control of the config. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the config schema

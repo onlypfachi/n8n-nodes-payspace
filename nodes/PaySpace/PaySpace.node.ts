@@ -1,4 +1,4 @@
-import type {
+import {
 	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
@@ -20,7 +20,12 @@ import {
 	leaveEndpointsCollectionOptions,
 	otherEndpointsCollectionOptions,
 } from './options/employee.options';
-import { appendUrl, mapApiArray, getTokenAndCompany } from './paySpace.utils';
+import {
+	appendUrl,
+	mapApiArray,
+	getTokenAndCompany,
+	ExecutionAuth,
+} from './paySpace.utils';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import {
@@ -139,44 +144,47 @@ export class PaySpace implements INodeType {
 			client_id: string;
 			client_secret: string;
 			client_scope: string;
+			environment: string;
 		};
 		let responseData: any;
 
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
-				const environment = this.getNodeParameter('environment', i) as string;
 				const apiUrl: string =
-					environment === 'staging'
+					credentials.environment === 'staging'
 						? 'https://apistaging.payspace.com/odata/v1.1/'
 						: 'https://api.payspace.com/odata/v1.1/';
 				const authenticationUrl: string =
-					environment === 'staging'
+					credentials.environment === 'staging'
 						? 'https://staging-identity.yourhcm.com/connect/token'
 						: 'https://identity.yourhcm.com/connect/token';
 
 				let config: AxiosRequestConfig = {};
+				let auth: ExecutionAuth | undefined;
 
-				// Get Token for other operations
-				const client_id = credentials?.client_id;
+				const client_id = credentials.client_id;
 				const client_secret = credentials.client_secret;
 				const client_scope = credentials.client_scope;
-				const url = authenticationUrl;
-				const company = operation === 'authorization' ? '' : (this.getNodeParameter('company', i) as string);
-				const company_identifier = operation === 'authorization' ? '' : (this.getNodeParameter('company_identifier', i) as string);
-				const client = await getTokenAndCompany({
+
+				// Retrieve company information if operation is not 'authorization'
+				const identifier = operation === 'authorization' ? '' : this.getNodeParameter('identifier', i) as string;
+				const identifier_field = operation === 'authorization' ? '' : this.getNodeParameter('identifier_field', i) as any;
+
+				// Attempt to get the token and company
+				auth = await getTokenAndCompany({
 					client_id,
 					client_secret,
-					url,
+					url: authenticationUrl,
 					client_scope,
-					company,
-					company_identifier
+					identifier,
+					identifier_field,
+					node: this.getNode(),
 				});
 
-				//set token and company id
-				const paySpaceAccessToken = `Bearer ${client?.token}`;
-				const c = client?.company;
-				let companyId: number | undefined = c?.company_id;
+				// Set token and company ID if auth is retrieved successfully
+				const paySpaceAccessToken = auth ? `Bearer ${auth.token}` : '';
+				let companyId: number | undefined = auth?.company?.company_id;
 
 				if (operation === 'authorization') {
 					// Get access token
