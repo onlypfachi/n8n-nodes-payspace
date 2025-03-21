@@ -48,7 +48,7 @@ So that you know, all contributions to this node are welcome. Feel free to creat
 
 You can get in contact with the developer [here](https://github.com/onlypfachi/)
 
-[*BUY ME A COFFEE*](https://github.com)
+[☕](https://github.com)
 
 ## License
 
