@@ -1,8 +1,4 @@
-#
-
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
-
-## n8n PaySpace Node
+# n8n PaySpace Node
 
 This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can use this node to READ, CREATE, UPDATE or DELETE  PaySpace data in the n8n system.
 
