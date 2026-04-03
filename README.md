@@ -1,53 +1,56 @@
 # n8n PaySpace Node
 
-This repository contains an n8n node for interacting with the PaySpace API. PaySpace powerful API allows you to access your employee data in order to utilize in your business environment. You can use this node to READ, CREATE, UPDATE or DELETE  PaySpace data in the n8n system.
+This repository contains an n8n node for interacting with the PaySpace API. The PaySpace API allows you to access your employee data to utilize it in your business environment. You can use this node to READ, CREATE, UPDATE, or DELETE PaySpace data within the n8n system.
 
-Installation
-Install the node in your n8n server.
-Restart your n8n server.
-Usage
-This node supports various PaySpace API functionalities. You can configure the node to:
+## Installation
 
-- Get Token
-- Get MetaData.
-- Get Employee *
-- Get Company *
-- Get Lookup Values *
-- File Upload
-- Get Webhooks
-- Custom Config
+Install the node in your n8n server and restart it.
+
+## Usage
+
+This node supports various PaySpace API functionalities. You can configure it to:
+
+-   Authentication
+-   Get Metadata
+-   Employee
+-   Company
+-   Lookup Values
+-   File Upload
+-   Webhooks
+-   Custom Config
 
 ## Properties
 
-- Environment: Specify the PaySpace environment (e.g., production, staging).
-- Operation: Choose the desired API operation (Get token, Get Metadata, etc.).
-- Api: Choose the desired API endpoint according to your needs.
+-   Environment: Specify the PaySpace environment (e.g., production, staging).
+-   Operation: Choose the desired API operation (Get token, Get Metadata, etc.).
+-   Api: Choose the desired API endpoint.
 
 ## Values
-You can use these values for expressions 
-### Company Identifier Field	
+
+You can use these values for expressions:
+
+### Company Identifier Field
+
 ```
 1- company_id
 2- company_name
 3- company_code
 ```
 
-	
-
 ## Override Config
 
-This node uses NodeJs-Axios. If what you want to do is not working with the provided API options you can override the ``` Axios.config ``` by selecting ```CustomConfig``` in the operation. This will give you direct control of the config object. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the config schema
+This node uses the `axios` package. If the provided API options do not meet your needs, you can select the `Custom Config` operation to provide your own `AxiosRequestConfig` object. This gives you direct control over the request configuration. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the request and API schema.
 
 ## Development
 
-So that you know, all contributions to this node are welcome. Feel free to create pull requests for bug fixes or improvements.
+All contributions to this node are welcome. Feel free to create pull requests for bug fixes or improvements.
 
-You can get in contact with the developer [here](https://github.com/onlypfachi/)
+You can contact the developer [here](https://github.com/onlypfachi/)
 
 [☕](https://github.com)
 
 ## License
 
-This node is licensed under the MIT License. [See the LICENSE file for details](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md).
+This node is licensed under the MIT License. See the [LICENSE file](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md) for details.
 
-<code>Developer does not work for Payspace, this is utterly made for convenience use of the powerful API, also because it's a fun project <code>
+The developer does not work for PaySpace. This project is an independent convenience tool built to make use of the PaySpace API and as a fun project.
