@@ -10,13 +10,13 @@ Install the node in your n8n server and restart it.
 
 This node supports various PaySpace API functionalities. You can configure it to:
 
--   Get Token
--   Get MetaData
--   Get Employee \*
--   Get Company \*
--   Get Lookup Values \*
+-   Authentication
+-   Get Metadata
+-   Employee
+-   Company
+-   Lookup Values
 -   File Upload
--   Get Webhooks
+-   Webhooks
 -   Custom Config
 
 ## Properties
@@ -39,7 +39,7 @@ You can use these values for expressions:
 
 ## Override Config
 
-This node uses NodeJs-Axios. If the provided API options do not meet your needs, you can override the `Axios.config` by selecting `CustomConfig` in the operation. This will give you direct control of the config object. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the config schema.
+This node uses the `axios` package. If the provided API options do not meet your needs, you can select the `Custom Config` operation to provide your own `AxiosRequestConfig` object. This gives you direct control over the request configuration. Make sure you visit the documentation [here](https://developer.payspace.com/) and understand the request and API schema.
 
 ## Development
 
@@ -53,4 +53,4 @@ You can contact the developer [here](https://github.com/onlypfachi/)
 
 This node is licensed under the MIT License. See the [LICENSE file](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md) for details.
 
-`Developer does not work for Payspace, this is utterly made for convenience use of the powerful API, also because it's a fun project`
+The developer does not work for PaySpace. This project is an independent convenience tool built to make use of the PaySpace API and as a fun project.
